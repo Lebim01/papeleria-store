@@ -53,6 +53,7 @@ const columnData = [
     { id: 'nombre', numeric: false, label: 'Nombre', sortable : true, filterable : true },
     { id: 'linea', numeric: false, label: 'Linea de Producto', sortable : true, filterable : true },
     { id: 'marca', numeric: false, label: 'Marca', sortable : true, filterable : true },
+    { id: 'codigo', numeric: false, label: 'Código', sortable : true, filterable : true },
     { id: 'precio_compra', numeric: true, label: '($) Compra', sortable : true },
     { id: 'precio_venta', numeric: true, label: '($) Venta', sortable : true },
     { id: 'actions', label : 'Acciones', sortable : false, style : { minWidth : 150 } }
@@ -194,6 +195,7 @@ class Productos extends React.Component {
                             </Tooltip>
                     }
                 </TableCell>
+                <TableCell>{ props.codigo }</TableCell>
                 <TableCell numeric>{props.precio_compra}</TableCell>
                 <TableCell numeric>{props.precio_venta}</TableCell>
                 <TableCell>

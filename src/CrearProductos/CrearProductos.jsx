@@ -93,21 +93,16 @@ class CrearProductos extends React.Component {
         validStep2 : false,
         photos : [],
         photos_saved : [],
+        palabrasclave : [],
         nombre : '',
+        codigo : '',
         descripcion : '',
         linea : 0,
         marca : 0,
+        cantidad_unidades: 0,
         id : null,
         loading : true,
-        isNuevo : false,
-        isPromocion : false,
-        nuevo_hasta : '',
-        nuevo_desde : '',
-        promocion_desde : '',
-        promocion_hasta : '',
-        promocion_tipo_descuento : 'Porcentaje',
-        promocion_descuento : 0,
-        promocion_limite : 0,
+        isBox : false,
         errorMessage : ''
     };
 
@@ -130,16 +125,11 @@ class CrearProductos extends React.Component {
                         descripcion : r.data.descripcion,
                         linea : r.data.id_linea,
                         marca : r.data.id_marca,
+                        codigo : r.data.codigo,
                         photos_saved : r.data.photos,
-                        isNuevo : r.data.isNuevo,
-                        nuevo_desde : r.data.nuevo_desde,
-                        nuevo_hasta : r.data.nuevo_hasta,
-                        isPromocion : r.data.isPromocion,
-                        promocion_desde : r.data.promocion_desde,
-                        promocion_hasta : r.data.promocion_hasta,
-                        promocion_descuento : Number(r.data.promocion_descuento) || 0,
-                        promocion_limite : Number(r.data.promocion_limite) || 0,
-                        promocion_tipo_descuento : r.data.promocion_tipo_descuento,
+                        palabrasclave : r.data.palabrasclave,
+                        isBox : r.data.isBox,
+                        cantidad_unidades : r.data.cantidad_unidades,
                         validStep2 : true,
                         loading : false
                     }, ()=> {
@@ -175,13 +165,10 @@ class CrearProductos extends React.Component {
     }
 
     boolValidStep1(){
-        let { nombre, linea, marca, promocion_desde, promocion_hasta, nuevo_desde, nuevo_hasta, isNuevo, isPromocion } = this.state
+        let { nombre, linea, marca, promocion_desde, promocion_hasta, nuevo_desde, nuevo_hasta, isNuevo, isPromocion, cantidad_unidades, isBox } = this.state
         let valid = true
 
         if(!(nombre !== '')) valid = false
-        if(!(linea > 0)) valid = false
-        if(!(marca > 0)) valid = false
-
         if(isNuevo) if(!moment(nuevo_desde).isBefore(nuevo_hasta)) valid = false
         if(isPromocion) if(!moment(promocion_desde).isBefore(promocion_hasta)) valid = false
 
@@ -247,15 +234,10 @@ class CrearProductos extends React.Component {
                 linea : this.state.linea,
                 marca : this.state.marca,
                 id : this.state.id,
-                isNuevo : this.state.isNuevo,
-                isPromocion : this.state.isPromocion,
-                nuevo_desde : this.state.nuevo_desde,
-                nuevo_hasta : this.state.nuevo_hasta,
-                promocion_descuento : this.state.promocion_descuento,
-                promocion_desde : this.state.promocion_desde,
-                promocion_hasta : this.state.promocion_hasta,
-                promocion_tipo_descuento : this.state.promocion_tipo_descuento,
-                promocion_limite : this.state.promocion_limite
+                codigo : this.state.codigo,
+                palabrasclave : this.state.palabrasclave,
+                isBox : this.state.isBox,
+                cantidad_unidades : this.state.cantidad_unidades,
             },
             headers = { headers: {'Content-Type': 'application/json;charset=UTF-8'} }
             axios.post(SAVE_PRODUCTS, params, headers)
@@ -285,7 +267,7 @@ class CrearProductos extends React.Component {
 
     render() {
         const { classes, theme } = this.props;
-        const { validStep1, validStep2, nombre, descripcion, linea, marca, photos, photos_saved, loading, isNuevo, isPromocion, nuevo_desde, nuevo_hasta, promocion_descuento, promocion_desde, promocion_hasta, promocion_tipo_descuento, promocion_limite, errorMessage } = this.state
+        const { validStep1, validStep2, nombre, descripcion, codigo, linea, marca, photos, photos_saved, palabrasclave, isBox, cantidad_unidades, loading, errorMessage } = this.state
         
         return (
             <div className={classes.root}>
@@ -341,7 +323,7 @@ class CrearProductos extends React.Component {
                     <TabContainer dir={theme.direction}>
                         <InformacionBasica 
                             onChange={this.changeStep1.bind(this)}
-                            {...{nombre, descripcion, linea, marca, isNuevo, isPromocion, nuevo_desde, nuevo_hasta, promocion_descuento, promocion_desde, promocion_hasta, promocion_tipo_descuento, promocion_limite, errorMessage}} />
+                            {...{nombre, descripcion, linea, marca, codigo, palabrasclave, isBox, cantidad_unidades, errorMessage}} />
                     </TabContainer>
                     <TabContainer dir={theme.direction}>
                         <Fotos 

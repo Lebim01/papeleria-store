@@ -43,10 +43,6 @@ class Photo extends React.Component {
                             <a onClick={this.handleRemove} className="btn btn-default btn-xs">
                                 <i className="fa fa-trash"></i>
                             </a>
-                            { this.props.favorite 
-                                ? <a onClick={this.handleFavorite} className="btn btn-default btn-xs" title="Desmarcar como imagen principal de este producto"><i className="fa fa-star text-yellow"></i></a> 
-                                : <a onClick={this.handleFavorite} className="btn btn-default btn-xs" title="Marcar como imagen principal de este producto"><i className="fa fa-star"></i></a>
-                            }
                         </div>
                     </div>
                 </div>

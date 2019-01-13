@@ -2,16 +2,18 @@ import React from 'react'
 import axios from 'axios'
 import {LIST_LINEAS, LIST_MARCAS} from 'routing'
 import green from 'material-ui/colors/green';
+import { withStyles } from '@material-ui/core/styles';
 import {
-    FormControlLabel,
-    Checkbox,
     Select,
     Grid,
     FormControl,
     TextField,
-    InputLabel
+    InputLabel,
+    Chip,
+    InputAdornment,
+    FormControlLabel,
+    Checkbox
 } from 'material-ui'
-import moment from 'moment'
 
 const styles = theme => ({
     root: {
@@ -53,6 +55,9 @@ const styles = theme => ({
     padding: {
         padding: `0 ${theme.spacing.unit * 2}px`,
     },
+    chip: {
+        margin: theme.spacing.unit / 2,
+    },
 });
 
 class InformacionBasica extends React.Component {
@@ -61,17 +66,17 @@ class InformacionBasica extends React.Component {
         marca : '',
         nombre : '',
         descripcion : '',
+        codigo : '',
+        cantidad_unidades : 0,
         lineas : [],
         marcas : [],
-        isNuevo : false,
-        nuevo_desde : '',
-        nuevo_hasta : '',
-        isPromocion : false,
-        promocion_desde : '',
-        promocion_hasta : '',
-        promocion_limite : 0,
-        promocion_tipo_descuento : 'Porcentaje',
-        promocion_descuento : 0
+        palabrasclave : [],
+        isBox : false
+    }
+
+    constructor(props){
+        super(props)
+        this.updateEstado = this.updateEstado.bind(this)
     }
 
     componentDidMount(){
@@ -93,48 +98,71 @@ class InformacionBasica extends React.Component {
             marca : props.marca,
             nombre : props.nombre,
             descripcion : props.descripcion,
-            isNuevo : props.isNuevo,
-            isPromocion : props.isPromocion,
-            nuevo_desde : props.nuevo_desde,
-            nuevo_hasta : props.nuevo_hasta,
-            promocion_desde : props.promocion_desde,
-            promocion_hasta : props.promocion_hasta,
-            promocion_descuento : props.promocion_descuento,
-            promocion_limite : props.promocion_limite,
-            promocion_tipo_descuento : props.promocion_tipo_descuento,
-            errorMessage : props.errorMessage
+            codigo : props.codigo,
+            isBox : props.isBox,
+            palabrasclave : props.palabrasclave,
+            errorMessage : props.errorMessage,
+            cantidad_unidades : props.cantidad_unidades
         })
     }
 
     handleChange = name => event => {
         this.setState({
-            [name]: name === 'isNuevo' || name === 'isPromocion'
+            [name]: name === 'isNuevo' || name === 'isPromocion' || name === 'isBox'
                 ? !this.state[name] 
                 : event.target.value
         }, () => {
-            if(this.props.onChange){
-                let estado = { 
-                    nombre : this.state.nombre,
-                    descripcion : this.state.descripcion,
-                    linea : this.state.linea,
-                    marca : this.state.marca,
-                    isNuevo : this.state.isNuevo,
-                    isPromocion : this.state.isPromocion,
-                    nuevo_desde : this.state.nuevo_desde,
-                    nuevo_hasta : this.state.nuevo_hasta,
-                    promocion_descuento : this.state.promocion_descuento,
-                    promocion_desde : this.state.promocion_desde,
-                    promocion_hasta : this.state.promocion_hasta,
-                    promocion_limite : this.state.promocion_limite,
-                    promocion_tipo_descuento : this.state.promocion_tipo_descuento,
-                }
-                this.props.onChange(estado)
-            }
+            this.updateEstado()
         });
     }
 
+    updateEstado = () => {
+        if(this.props.onChange){
+            let estado = { 
+                nombre : this.state.nombre,
+                descripcion : this.state.descripcion,
+                linea : this.state.linea,
+                marca : this.state.marca,
+                codigo : this.state.codigo,
+                isBox : this.state.isBox,
+                palabrasclave : this.state.palabrasclave,
+                cantidad_unidades : this.state.cantidad_unidades
+            }
+            this.props.onChange(estado)
+        }
+    }
+
+    onKeyPress = (ev) => {
+        if (ev.key === 'Enter') {
+            if(this.state._palabraclave){
+                let _palabras = this.state.palabrasclave
+                _palabras.push({
+                    key : _palabras.length,
+                    label : this.state._palabraclave
+                })
+                this.setState({
+                    palabrasclave : _palabras,
+                    _palabraclave : ''
+                }, () => {
+                    this.updateEstado()
+                })
+            }
+        }
+    }
+
+    handleDelete = (data) => {
+        let _palabras = this.state.palabrasclave
+        _palabras = _palabras.filter((r) => r.label !== data.label)
+        this.setState({
+            palabrasclave : _palabras
+        }, () => {
+            this.updateEstado()
+        })
+    }
+
     render(){
-        const { errorMessage, isNuevo, nuevo_desde, nuevo_hasta, promocion_tipo_descuento, nombre, descripcion, linea, marca, isPromocion, promocion_desde, promocion_hasta, promocion_limite, promocion_descuento } = this.state
+        const { errorMessage, nombre, descripcion, linea, marca, palabrasclave, _palabraclave, codigo, isBox, cantidad_unidades } = this.state
+        const { classes } = this.props
         return (
             <div className={styles.root}>
                 <Grid container spacing={24} className={styles.row}>
@@ -167,6 +195,34 @@ class InformacionBasica extends React.Component {
                         />
                     </Grid>
                 </Grid>
+
+                <Grid container spacing={24} className={styles.row}>
+                    <Grid item xs={12} md={4} className={styles.paper}>
+                        <TextField
+                            label="Código"
+                            className={styles.textField}
+                            value={codigo}
+                            onChange={this.handleChange('codigo')}
+                            fullWidth
+                            error={errorMessage !== ''}
+                            helperText={errorMessage}
+                            InputLabelProps={{
+                                shrink: true,
+                            }}
+                            InputProps={{
+                                startAdornment : 
+                                    <InputAdornment position="start">
+                                        {/* CODIGO DE BARRAS FONTAWESOME */}
+                                        <i className="fa fa-barcode"></i>
+                                    </InputAdornment>
+                            }}
+                        />
+                    </Grid>
+                    <Grid item xs={12} md={4} className={styles.paper}>
+                        
+                    </Grid>
+                </Grid>
+
                 <Grid container spacing={24} className={styles.row}>
                     <Grid item xs={12} md={4} className={styles.paper}>
                         <FormControl className={styles.formControl} fullWidth>
@@ -186,7 +242,6 @@ class InformacionBasica extends React.Component {
                             </Select>
                         </FormControl>
                     </Grid>
-
                     <Grid item xs={12} md={4} className={styles.paper}>
                         <FormControl className={styles.formControl} fullWidth>
                             <InputLabel htmlFor="marca">Marca</InputLabel>
@@ -205,161 +260,71 @@ class InformacionBasica extends React.Component {
                             </Select>
                         </FormControl>
                     </Grid>
+                </Grid>
 
-                    <div className="col-md-6">
-                        <div>
-                            <div className="col-md-6 inline-block">
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            checked={isNuevo}
-                                            onChange={this.handleChange('isNuevo')}
-                                            value="true"
-                                        />
-                                    }
-                                    label="Nuevo"
+                <hr/>
+
+                <Grid container spacing={24} className={styles.row}>
+                    <Grid item xs={12} md={4} className={styles.paper}>
+                        <FormControl className={styles.formControl} fullWidth>
+                            <TextField
+                                label="Palabras clave"
+                                className={styles.textField}
+                                value={_palabraclave}
+                                onChange={this.handleChange('_palabraclave')}
+                                onKeyPress={this.onKeyPress}
+                                fullWidth
+                                error={errorMessage !== ''}
+                                helperText={errorMessage}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                        </FormControl>
+                        <FormControl className={styles.formControl} fullWidth>
+                            { palabrasclave.map((data) => 
+                                <Chip
+                                    key={data.key}
+                                    label={data.label}
+                                    className={classes.chip}
+                                    onDelete={(env) => this.handleDelete(data)}
                                 />
-                            </div>
-                            <div className="col-md-6 inline-block"></div>
-                        </div>
-                        <div>
-                            <div className="col-md-6 inline-block">
-                                { isNuevo &&
-                                    <TextField
-                                        label="Desde"
-                                        type="date"
-                                        onChange={this.handleChange('nuevo_desde')}
-                                        value={nuevo_desde}
-                                        error={nuevo_desde && nuevo_hasta ? moment(nuevo_desde).isAfter(nuevo_hasta) : false}
-                                        helperText={nuevo_desde && nuevo_hasta ? moment(nuevo_desde).isAfter(nuevo_hasta) ? 'Fecha incorrecta' : '' : ''}
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                    />
-                                }
-                            </div>
-                            <div className="col-md-6 inline-block">
-                                { isNuevo &&
-                                    <TextField
-                                        label="Hasta"
-                                        type="date"
-                                        onChange={this.handleChange('nuevo_hasta')}
-                                        value={nuevo_hasta}
-                                        error={nuevo_desde && nuevo_hasta ? moment(nuevo_hasta).isBefore(nuevo_desde) : false}
-                                        helperText={nuevo_desde && nuevo_hasta ? moment(nuevo_hasta).isBefore(nuevo_desde) ? 'Fecha incorrecta' : '' : ''}
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                    />
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="col-md-6">
-                        <div>
-                            <div className="col-md-6 inline-block">
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="isPromocion"
-                                            checked={isPromocion}
-                                            onChange={this.handleChange('isPromocion')}
-                                            value="isPromocion"
-                                        />
-                                    }
-                                    label="Promoción"
+                            )}
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={6} md={4} className={styles.paper}>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    name="isBox"
+                                    checked={isBox}
+                                    onChange={this.handleChange('isBox')}
+                                    value="isBox"
                                 />
-                            </div>
-                            <div className="col-md-6 inline-block"></div>
-                        </div>
-                        
-                        <div>
-                            <div className="col-md-6 inline-block">
-                                { isPromocion &&
-                                    <TextField
-                                        label="Desde"
-                                        type="date"
-                                        onChange={this.handleChange('promocion_desde')}
-                                        fullWidth
-                                        value={promocion_desde}
-                                        error={promocion_desde && promocion_hasta ? moment(promocion_desde).isAfter(promocion_hasta) : false}
-                                        helperText={promocion_desde && promocion_hasta ? moment(promocion_desde).isAfter(promocion_hasta) ? 'Fecha incorrecta' : '' : ''}
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                    />
-                                }
-                            </div>
-                            <div className="col-md-6 inline-block">
-                                { isPromocion &&
-                                    <TextField
-                                        label="Hasta"
-                                        type="date"
-                                        onChange={this.handleChange('promocion_hasta')}
-                                        fullWidth
-                                        value={promocion_hasta}
-                                        error={promocion_desde && promocion_hasta ? moment(promocion_hasta).isBefore(promocion_desde) : false}
-                                        helperText={promocion_desde && promocion_hasta ? moment(promocion_hasta).isBefore(promocion_desde) ? 'Fecha incorrecta' : '' : ''}
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                    />
-                                }
-                            </div>
-                        </div>
-                        
-                        <div style={{ marginTop : 10 }}>
-                            <div className="col-md-6 inline-block">
-                                { isPromocion &&
-                                    <TextField 
-                                        label="Descuento"
-                                        fullWidth 
-                                        value={promocion_descuento}
-                                        onChange={this.handleChange('promocion_descuento')}
-                                    />
-                                }
-                            </div>
-                            <div className="col-md-6 inline-block">
-                                { isPromocion &&
-                                    <FormControl className={styles.formControl} fullWidth>
-                                        <InputLabel htmlFor="tipo_descuento">Tipo Descuento</InputLabel>
-                                        <Select
-                                            value={promocion_tipo_descuento}
-                                            native={true}
-                                            onChange={this.handleChange('promocion_tipo_descuento')}
-                                            style={{textAlign : 'left'}}
-                                            inputProps={{
-                                                name: 'tipo_descuento',
-                                                id: 'tipo_descuento'
-                                            }}
-                                        >
-                                            <option value="Porcentaje">Porcentaje</option>
-                                            <option value="Cantidad">Cantidad</option>
-                                        </Select>
-                                    </FormControl>
-                                }
-                            </div>
-                        </div>
-
-                        <div style={{ marginTop : 10 }}>
-                            <div className="col-md-6 inline-block">
-                                { isPromocion &&
-                                    <TextField 
-                                        fullWidth 
-                                        label={"Limite de productos"} 
-                                        value={promocion_limite}
-                                        onChange={this.handleChange('promocion_limite')}
-                                    />
-                                }
-                            </div>
-                            <div className="col-md-6 inline-block"></div>
-                        </div>
-                    </div>
+                            }
+                            label="Es Paquete?"
+                        />
+                    </Grid>
+                    <Grid item xs={6} md={4} className={styles.paper}>
+                        { isBox &&
+                            <TextField 
+                                label="Cantidad de Unidades"
+                                fullWidth 
+                                value={cantidad_unidades}
+                                onChange={this.handleChange('cantidad_unidades')}
+                                InputLabelProps={{
+                                    shrink: true,
+                                }}
+                            />
+                        }
+                    </Grid>
+                </Grid>
+                <Grid container spacing={24} className={styles.row}>
+                    
                 </Grid>
             </div>
         )
     }
 }
 
-export default InformacionBasica
+export default withStyles(styles)(InformacionBasica)

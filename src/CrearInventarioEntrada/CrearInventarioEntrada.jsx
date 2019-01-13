@@ -1,196 +1,74 @@
 import React from 'react'
-import { Grid, withStyles } from "material-ui";
-
+import { withStyles } from "material-ui";
 import {
     RegularCard,
-    CustomInput,
     Button,
     ItemGrid
 } from './../components';
-import { Table, TableBody, TableCell, TableHead, TableRow, Tooltip } from '@material-ui/core';
-import { MenuItem } from 'material-ui/Menu';
-import Select from 'material-ui/Select';
-import { FormControl } from 'material-ui/Form';
-import NumberFormat from 'react-number-format';
-import TextField from '@material-ui/core/TextField';
-
+import {
+    TextField,
+    Grid,
+    Typography,
+    Table, 
+    TableBody, 
+    TableCell, 
+    TableHead, 
+    TableRow, 
+    Tooltip
+} from '@material-ui/core'
 import './CrearInventarioEntrada.css'
 import axios from 'axios'
 import toastr from 'toastr'
-import { LIST_PRODUCTS, LIST_MARCAS, ADD_INVENTORY } from './../routing'
+import { LIST_MARCAS, ADD_INVENTORY, ONE_PRODUCTS } from './../routing'
 import { UNEXPECTED } from './../dictionary'
-
-function NumberFormatCustom(props) {
-    const { inputRef, onChange, ...other } = props;
-    return (
-        <NumberFormat
-            {...other}
-            ref={inputRef}
-            onValueChange={values => {
-                onChange({
-                    target: {
-                        value: values.value,
-                    },
-                });
-            }}
-            thousandSeparator
-            prefix="$"
-        />
-    );
-}
+import DialogAddProduct from './DialogAddProduct';
+import AddProducto from './AddProducto'
+import DialogHistoryPrice from './DialogHistoryPrice'
 
 const styles = {
     underline : {
         backgroundColor : '#000'
+    },
+    paper : {
+        display : 'inline-block'
+    },
+    backgroundColor : {
+        backgroundColor : 'red'
+    },
+    fixwidth : {
+        width : '30vh'
     }
-}
-
-class AddProducto extends React.Component {
-    state = {
-        productos : []
-    }
-
-    handleChange = (name) => e => {
-        const { id_marca, id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta } = this.props
-        let data = { id_marca, id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta }
-        data[name] = e.target.value
-
-        if(name === 'id_producto'){
-            let p = this.state.productos.filter((p) => p.id === data[name])[0]
-            data.placeholder_compra = p.precio_compra
-            data.placeholder_venta = p.precio_venta
-        }
-        this.props.handleChange(data, this.props.index)
-    }
-
-    componentWillReceiveProps(props){
-        if(this.props.id_marca !== props.id_marca){
-            this.handleChangeMarca(props.id_marca)
-        }
-    }
-
-    handleChangeMarca(id_marca){
-        axios.post(LIST_PRODUCTS, { id_marca })
-        .then((r) => {
-            this.setState({
-                productos : r.data || []
-            })
-        })
-    }
-
-    render(){
-        const { productos } = this.state
-        const { id_marca, id_producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta, marcas } = this.props
-        return (
-            <TableRow>
-                <TableCell padding={'dense'}>
-                    <FormControl fullWidth>
-                        <Select
-                            value={id_marca}
-                            onChange={this.handleChange('id_marca')}
-                            style={{textAlign : 'left'}}
-                            inputProps={{
-                                name: 'id_marca',
-                                id: 'id_marca'
-                            }}
-                        >
-                            <MenuItem value={0}>Seleccione</MenuItem>
-                            {marcas.map((b, i) => <MenuItem key={i} value={b.id}>{b.nombre}</MenuItem> )}
-                        </Select>
-                    </FormControl>
-                </TableCell>
-                <TableCell padding={'dense'}>
-                    <FormControl fullWidth>
-                        <Select
-                            value={id_producto}
-                            onChange={this.handleChange('id_producto')}
-                            style={{textAlign : 'left'}}
-                            inputProps={{
-                                name: 'id_producto',
-                                id: 'id_producto'
-                            }}
-                        >
-                            <MenuItem value={0}>Seleccione</MenuItem>
-                            {productos.map((b, i) => <MenuItem key={i} value={b.id}>{b.nombre}</MenuItem> )}
-                        </Select>
-                    </FormControl>
-                </TableCell>
-                <TableCell padding={'dense'} style={{width: 100, maxWidth: 100}}>
-                    <CustomInput
-                        id="cantidad"
-                        formControlProps={{
-                            style : {
-                                margin: 0
-                            },
-                            fullWidth : true
-                        }}
-                        classes={{
-                            underline : '#000'
-                        }}
-                        inputProps={{
-                            onChange: this.handleChange('cantidad'),
-                            value : cantidad,
-                            type : 'number',
-                            min : 1
-                        }}
-                    />
-                </TableCell>
-                <TableCell padding={'dense'}>
-                    <TextField
-                        value={precio_compra}
-                        onChange={this.handleChange('precio_compra')}
-                        id="precio_compra"
-                        placeholder={placeholder_compra}
-                        InputProps={{
-                            inputComponent: NumberFormatCustom
-                        }}
-                    />
-                </TableCell>
-                <TableCell padding={'dense'}>
-                    <TextField
-                        value={precio_venta}
-                        onChange={this.handleChange('precio_venta')}
-                        id="precio_venta"
-                        placeholder={placeholder_venta}
-                        InputProps={{
-                            inputComponent: NumberFormatCustom
-                        }}
-                    />
-                </TableCell>
-                <TableCell padding={'dense'}></TableCell>
-            </TableRow>
-        )
-    }
-}
-AddProducto.defaultProps = {
-    id_producto : '',
-    id_marca : '',
-    cantidad : 0,
-    index : -1,
-    marcas : [],
-    placeholder_compra : '',
-    placeholder_venta : '',
-    handleChange : () => {}
 }
 
 class Crear extends React.Component {
-    state = { list : [] }
+    state = { 
+        list : [], 
+        historyPrices : [],
+        factura : '', 
+        proveedor : '', 
+        producto : '',
+        descuento : '',
+        openAddProduct : false,
+        openHistoryPrice : false
+    }
 
     constructor(props){
         super(props)
 
-        this.handleChange = this.handleChange.bind(this)
-        this.save = this.save.bind(this)
         this.add = this.add.bind(this)
+        this.save = this.save.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.deleteProduct = this.deleteProduct.bind(this)
+        this.handleAddProduct = this.handleAddProduct.bind(this)
+        this.handleCloseAddProduct = this.handleCloseAddProduct.bind(this)
+        this.openModalHistoryPrice = this.openModalHistoryPrice.bind(this)
+        this.handleCloseHistoryPrice = this.handleCloseHistoryPrice.bind(this)
     }
 
-    componentDidMount(){
-        axios.post(LIST_MARCAS)
-        .then((r) => {
-            this.setState({
-                marcas : r.data || []
-            })
-        })
+    handleChangeInput = name => event => {
+        this.setState({
+            [name]: event.target.value
+        });
     }
 
     handleChange = (prod, index) => {
@@ -207,9 +85,19 @@ class Crear extends React.Component {
 
     save(e){
         e.preventDefault()
-        let _products = this.state.list
+        const _products = this.state.list
+        const { factura, _descuento, _subtotal, _iva, _total } = this.state
         if(_products.length > 0){
-            axios.post(ADD_INVENTORY, { productos: _products, token : localStorage.getItem('token') })
+            const params = { 
+                productos: _products, 
+                token : localStorage.getItem('token'),
+                factura,
+                descuento : _descuento,
+                subtotal : _subtotal,
+                iva : _iva,
+                total:  _total
+            }
+            axios.post(ADD_INVENTORY, params)
             .then(({data}) => {
                 if(data.status === 200){
                     toastr.success(`Se guardo con éxito`)
@@ -226,26 +114,92 @@ class Crear extends React.Component {
     }
 
     add(){
+        /**/
+        
+        // OPEN MODAL
+        this.setState({
+            openAddProduct : true
+        })
+    }
+
+    handleCloseAddProduct(){
+        this.setState({
+            openAddProduct : false
+        })
+    }
+
+    async handleAddProduct({ id_producto }){
         let list = this.state.list
-        list.push({ id_producto : 0, cantidad : 0, precio : 0, id_marca : 0 })
+        let exists = this.state.list.filter((p) => p.id_producto == id_producto).length > 0
+        if(!exists){
+            let product = (await axios.post(ONE_PRODUCTS, { id: id_producto })).data
+            list.push({ id_producto, producto : product.nombre, cantidad : 0, precio : 0 })
+            this.setState({
+                list,
+                openAddProduct : false
+            })
+        }else{
+            toastr.error('Este producto ya esta en la lista')
+        }
+    }
+
+    deleteProduct(id_producto){
+        let list = this.state.list
+        list = list.filter((p) => p.id_producto != id_producto)
         this.setState({
             list
         })
     }
 
+    round(value){
+        return Math.round(value * 100) / 100
+    }
+
+    openModalHistoryPrice(data){
+        this.setState({
+            openHistoryPrice : true,
+            historyPrices : data
+        })
+    }
+
+    handleCloseHistoryPrice(){
+        this.setState({
+            openHistoryPrice : false
+        })
+    }
+
     render(){
-        const { list, marcas } = this.state
+        const { list, factura, proveedor, descuento } = this.state
         const { black } = this.props
         const validos = list.filter(product => 
-            product.id_marca > 0 &&
             product.id_producto > 0 &&
             (product.cantidad > 0 || product.cantidad < 0) &&
             (product.precio_compra > 0 || product.placeholder_compra > 0) &&
             (product.precio_venta > 0 || product.placeholder_venta > 0)
         )
         const isValid = validos.length == list.length && list.length > 0
+        
+        /* CALCULOS DE SUBTOTAL */
+        const _subtotal = this.round(list.reduce((a, b) => a + (b.cantidad * (b.precio_compra || b.placeholder_compra)), 0) || 0)
+        const _iva = this.round(_subtotal * 0.16)
+        const _descuento = this.round((_subtotal + _iva) * (descuento / 100))
+        const _total = this.round(_subtotal + _iva - _descuento)
+
         return (
             <div className="create-line">
+
+                <DialogAddProduct
+                    open={this.state.openAddProduct}
+                    handleClose={this.handleCloseAddProduct}
+                    handleAdd={this.handleAddProduct}
+                />
+
+                <DialogHistoryPrice
+                    open={this.state.openHistoryPrice}
+                    handleClose={this.handleCloseHistoryPrice}
+                    data={this.state.historyPrices}
+                />
+
                 <Grid container>
                     <ItemGrid xs={12} sm={12} md={12}>
                         <RegularCard
@@ -257,13 +211,73 @@ class Crear extends React.Component {
                             }}
                             content={
                                 <div>
-                                    <Button classes={{ button: 'text-body primary float-right' }} onClick={this.add}>
-                                        Agregar&nbsp;&nbsp;<i className="fa fa-plus"></i>
-                                    </Button>
+                                    <Grid container spacing={24} className={styles.row}>
+                                        <Grid item xs={12} md={4} className={styles.paper}>
+                                            <TextField
+                                                label="# Factura"
+                                                className={styles.textField}
+                                                value={factura}
+                                                onChange={this.handleChangeInput('factura')}
+                                                fullWidth
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} md={4} className={styles.paper}>
+                                            <TextField
+                                                label="Proveedor"
+                                                className={styles.textField}
+                                                value={proveedor}
+                                                onChange={this.handleChangeInput('proveedor')}
+                                                fullWidth
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} md={4} className={styles.paper}>
+                                            <TextField
+                                                label="% Descuento"
+                                                className={styles.textField}
+                                                value={descuento}
+                                                placeholder="0-100 %"
+                                                onChange={this.handleChangeInput('descuento')}
+                                                fullWidth
+                                                InputProps={{
+                                                    type :"number"
+                                                }}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <hr/>
+                                    <Grid container spacing={24} className={styles.row}>
+                                        <Grid item xs={12} md={4} className={styles.paper}>
+                                            <Button classes={{ button: 'text-body primary' }} onClick={this.add}>
+                                                Agregar Producto &nbsp;&nbsp;<i className="fa fa-plus"></i>
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </div>
+                            }
+                        />
+                    </ItemGrid>
+                    <ItemGrid xs={12} sm={12} md={12}>
+                        <RegularCard
+                            cardTitle="Productos"
+                            headerColor='red'
+                            classes={{
+                                cardHeader : 'RegularCard-cardTitle-101'
+                            }}
+                            content={
+                                <div>
                                     <Table>
                                         <TableHead>
                                             <TableRow>
-                                                <TableCell padding={'dense'}>Marca</TableCell>
+                                                <TableCell style={{width : 100}}></TableCell>
                                                 <TableCell padding={'dense'}>
                                                     Producto&nbsp;&nbsp;
                                                     <Tooltip title="Elija una marca primero para cargar los productos">
@@ -273,7 +287,7 @@ class Crear extends React.Component {
                                                     </Tooltip>
                                                 </TableCell>
                                                 <TableCell padding={'dense'}>Cantidad</TableCell>
-                                                <TableCell padding={'dense'}>
+                                                <TableCell padding={'dense'} style={{width : 200}}>
                                                     $ Precio Compra&nbsp;&nbsp;
                                                     <Tooltip title="Al quedar vació tomara como valor el ultimo precio registrado">
                                                         <span className="badge badge-warning text-light">
@@ -281,7 +295,7 @@ class Crear extends React.Component {
                                                         </span>
                                                     </Tooltip>
                                                 </TableCell>
-                                                <TableCell padding={'dense'}>
+                                                <TableCell padding={'dense'} style={{width : 200}}>
                                                     $ Precio Venta&nbsp;&nbsp;
                                                     <Tooltip title="Al quedar vació tomara como valor el ultimo precio registrado">
                                                         <span className="badge badge-warning text-light">
@@ -289,22 +303,79 @@ class Crear extends React.Component {
                                                         </span>
                                                     </Tooltip>
                                                 </TableCell>
+                                                <TableCell style={{width : 100}}>
+                                                    % Utilidad
+                                                </TableCell>
                                                 <TableCell padding={'dense'}></TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
                                             { list.map((prod, i) => 
                                                 <AddProducto 
-                                                    key={i} 
-                                                    marcas={marcas}
+                                                    key={i}
                                                     {...prod} 
                                                     index={i}
                                                     black={black}
                                                     handleChange={this.handleChange}
+                                                    deleteProduct={this.deleteProduct}
+                                                    openModalHistoryPrice={this.openModalHistoryPrice}
                                                 /> 
                                             ) }
                                         </TableBody>
                                     </Table>
+                                    <Grid container spacing={24} className={styles.row}>
+                                        <Grid item xs={12} md={6} style={{ ...styles.paper }}>
+                                                
+                                        </Grid>
+                                        <Grid item xs={12} md={6} style={{ ...styles.paper }}>
+                                            <br/>
+                                            <br/>
+                                            <br/>
+                                            <Typography>
+                                                <Grid container xs={12} md={12}>
+                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
+                                                        Subtotal:
+                                                    </Grid>
+                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
+                                                        $ {_subtotal}
+                                                    </Grid>
+                                                </Grid>
+                                                <hr/>
+                                                <Grid container xs={12} md={12}>
+                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
+                                                        <Tooltip title="Subtotal * (1.6 / 100)">
+                                                            <span>Iva:</span>
+                                                        </Tooltip>
+                                                    </Grid>
+                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
+                                                        $ {_iva}
+                                                    </Grid>
+                                                </Grid>
+                                                <hr/>
+                                                <Grid container xs={12} md={12}>
+                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
+                                                        <Tooltip title="(Subtotal + Iva) * (% Descuento / 100)">
+                                                            <span>Descuento:</span>
+                                                        </Tooltip>
+                                                    </Grid>
+                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
+                                                        $ {_descuento}
+                                                    </Grid>
+                                                </Grid>
+                                                <hr/>
+                                                <Grid container xs={12} md={12}>
+                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
+                                                        <Tooltip title="Subtotal + Iva - Descuento">
+                                                            <span>Total:</span>
+                                                        </Tooltip>
+                                                    </Grid>
+                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
+                                                        $ {_total}
+                                                    </Grid>
+                                                </Grid>
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
                                 </div>
                             }
                             footer={

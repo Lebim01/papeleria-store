@@ -1,16 +1,17 @@
 import React from 'react'
 import axios from 'axios'
-import { withStyles } from 'material-ui/styles'
-
+import { withStyles } from '@material-ui/core/styles'
 import TableUI from './../components/TableUI'
 import { TableCell, TableRow } from 'material-ui/Table'
 import { INVENTORY } from './../routing'
-import Button from 'material-ui/Button'
-import Tooltip from 'material-ui/Tooltip'
 import {
     RegularCard
 } from './../components';
 import Loader from 'react-loader'
+import {
+    Fab,
+    Tooltip
+} from '@material-ui/core'
 import AddIcon from '@material-ui/icons/Add'
 
 const styles = theme => ({
@@ -96,9 +97,9 @@ class Inventario extends React.Component {
                     content = {
                         <div>
                             <Tooltip title="Agregar">
-                                <Button variant="fab" color="secondary" aria-label="Add" mini style={{float:'right'}} onClick={goAdd}>
+                                <Fab variant="fab" color="secondary" aria-label="Add" size="small" style={{float:'right'}} onClick={goAdd}>
                                     <AddIcon />
-                                </Button>
+                                </Fab>
                             </Tooltip>
                             <TableUI 
                                 RowFormat={this.RowFormat}

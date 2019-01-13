@@ -15,6 +15,16 @@
     color : white !important;
 }
 
+.danger {
+    background-color: #db1515 !important;
+    color : white !important;
+}
+
+.warning {
+    background-color : #f7e00e !important;
+    color : black !important;
+}
+
 .min-width-200 {
     min-width: 400px !important;
 }
