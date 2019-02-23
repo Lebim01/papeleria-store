@@ -57,6 +57,7 @@ class Crear extends React.Component {
 
         this.add = this.add.bind(this)
         this.save = this.save.bind(this)
+        this.changeTotals = this.changeTotals.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.deleteProduct = this.deleteProduct.bind(this)
         this.handleAddProduct = this.handleAddProduct.bind(this)
@@ -68,6 +69,10 @@ class Crear extends React.Component {
     handleChangeInput = name => event => {
         this.setState({
             [name]: event.target.value
+        }, () => {
+            if(name == 'descuento'){
+                this.changeTotals()
+            }
         });
     }
 
@@ -76,7 +81,7 @@ class Crear extends React.Component {
         list[index] = prod
         this.setState({
             list
-        })
+        }, this.changeTotals)
     }
 
     goList(){
@@ -168,8 +173,28 @@ class Crear extends React.Component {
         })
     }
 
+    suggestedPrice(){
+
+    }
+
+    changeTotals(){
+        const { descuento, list } = this.state
+
+        const _subtotal = this.round(list.reduce((a, b) => a + (b.cantidad * (b.precio_compra || b.placeholder_compra)), 0) || 0)
+        const _iva = this.round(_subtotal * 0.16)
+        const _descuento = this.round((_subtotal + _iva) * (descuento / 100))
+        const _total = this.round(_subtotal + _iva - _descuento)
+
+        this.setState({
+            _subtotal,
+            _iva,
+            _descuento,
+            _total
+        })
+    }
+
     render(){
-        const { list, factura, proveedor, descuento } = this.state
+        const { list, factura, proveedor, descuento , _subtotal, _iva, _descuento, _total } = this.state
         const { black } = this.props
         const validos = list.filter(product => 
             product.id_producto > 0 &&
@@ -178,12 +203,6 @@ class Crear extends React.Component {
             (product.precio_venta > 0 || product.placeholder_venta > 0)
         )
         const isValid = validos.length == list.length && list.length > 0
-        
-        /* CALCULOS DE SUBTOTAL */
-        const _subtotal = this.round(list.reduce((a, b) => a + (b.cantidad * (b.precio_compra || b.placeholder_compra)), 0) || 0)
-        const _iva = this.round(_subtotal * 0.16)
-        const _descuento = this.round((_subtotal + _iva) * (descuento / 100))
-        const _total = this.round(_subtotal + _iva - _descuento)
 
         return (
             <div className="create-line">
@@ -279,12 +298,7 @@ class Crear extends React.Component {
                                             <TableRow>
                                                 <TableCell style={{width : 100}}></TableCell>
                                                 <TableCell padding={'dense'}>
-                                                    Producto&nbsp;&nbsp;
-                                                    <Tooltip title="Elija una marca primero para cargar los productos">
-                                                        <span className="badge badge-warning text-light">
-                                                            <i className="fa fa-info"></i> 
-                                                        </span>
-                                                    </Tooltip>
+                                                    Producto
                                                 </TableCell>
                                                 <TableCell padding={'dense'}>Cantidad</TableCell>
                                                 <TableCell padding={'dense'} style={{width : 200}}>
@@ -295,6 +309,9 @@ class Crear extends React.Component {
                                                         </span>
                                                     </Tooltip>
                                                 </TableCell>
+                                                <TableCell style={{width : 200}}>
+                                                    % Utilidad
+                                                </TableCell>
                                                 <TableCell padding={'dense'} style={{width : 200}}>
                                                     $ Precio Venta&nbsp;&nbsp;
                                                     <Tooltip title="Al quedar vació tomara como valor el ultimo precio registrado">
@@ -302,9 +319,6 @@ class Crear extends React.Component {
                                                             <i className="fa fa-info"></i> 
                                                         </span>
                                                     </Tooltip>
-                                                </TableCell>
-                                                <TableCell style={{width : 100}}>
-                                                    % Utilidad
                                                 </TableCell>
                                                 <TableCell padding={'dense'}></TableCell>
                                             </TableRow>

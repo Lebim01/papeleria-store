@@ -16,7 +16,7 @@ import {
     Tooltip,
     Fab
 } from '@material-ui/core'
-import { LIST_PRODUCTS, LIST_PRICE_PRODUCT } from './../routing'
+import { SUGGESTED_PRICE, LIST_PRICE_PRODUCT } from './../routing'
 
 function NumberFormatCustom(props) {
     const { inputRef, onChange, ...other } = props;
@@ -47,32 +47,22 @@ class AddProducto extends React.Component {
         this.historyPrice = this.historyPrice.bind(this)
     }
 
-    handleChange = (name) => e => {
-        const { id_marca, id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta } = this.props
-        let data = { id_marca, id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta }
-        data[name] = e.target.value
+    suggestedPrice = async (...params) => {
+        let { data } = await axios.post(SUGGESTED_PRICE, params)
+        return data
+    }
 
-        if(name === 'id_producto'){
-            let p = this.state.productos.filter((p) => p.id === data[name])[0]
-            data.placeholder_compra = p.precio_compra
-            data.placeholder_venta = p.precio_venta
+    handleChange = name => async (e) => {
+        const { id_marca, id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta, utilidad } = this.props
+        let data = { id_marca, id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta, utilidad }
+        data[name] = e.target.value
+        
+        if(['cantidad', 'precio_compra', 'utilidad'].indexOf(name) !== -1){
+            let sugerido = await this.suggestedPrice(cantidad, precio_compra, placeholder_compra, utilidad)
+            data.placeholder_compra = sugerido.precio_compra
+            data.placeholder_venta = sugerido.precio_venta
         }
         this.props.handleChange(data, this.props.index)
-    }
-
-    componentWillReceiveProps(props){
-        if(this.props.id_marca !== props.id_marca){
-            this.handleChangeMarca(props.id_marca)
-        }
-    }
-
-    handleChangeMarca(id_marca){
-        axios.post(LIST_PRODUCTS, { id_marca })
-        .then((r) => {
-            this.setState({
-                productos : r.data || []
-            })
-        })
     }
 
     async historyPrice(){
@@ -83,7 +73,7 @@ class AddProducto extends React.Component {
     }
 
     render(){
-        const { id_producto, producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta } = this.props
+        const { id_producto, producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta, utilidad } = this.props
         return (
             <TableRow>
                 <TableCell padding={'dense'}>
@@ -136,6 +126,17 @@ class AddProducto extends React.Component {
                 </TableCell>
                 <TableCell padding={'dense'}>
                     <TextField
+                        value={utilidad}
+                        fullWidth={true}
+                        onChange={this.handleChange('utilidad')}
+                        id="utilidad"
+                        InputProps={{
+                            type : 'number'
+                        }}
+                    />
+                </TableCell>
+                <TableCell padding={'dense'}>
+                    <TextField
                         value={precio_venta}
                         fullWidth={true}
                         onChange={this.handleChange('precio_venta')}
@@ -145,11 +146,6 @@ class AddProducto extends React.Component {
                             inputComponent: NumberFormatCustom
                         }}
                     />
-                </TableCell>
-                <TableCell>
-                    {
-                        (Math.round(((precio_venta / precio_compra)-1)*100*100) / 100) || 0
-                    } %
                 </TableCell>
                 <TableCell padding={'dense'} style={{width: 100, maxWidth: 100}}>
                     <Button size="small" color="primary" variant="contained" className="danger" onClick={() => this.props.deleteProduct(id_producto)}>
@@ -165,6 +161,7 @@ AddProducto.defaultProps = {
     id_producto : '',
     id_marca : '',
     cantidad : 0,
+    utilidad : 0,
     index : -1,
     marcas : [],
     placeholder_compra : '',
