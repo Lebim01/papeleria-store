@@ -75,8 +75,8 @@ class DialogHistoryPrice extends React.Component {
                                 { data.map(r => 
                                     <ListItem>
                                         <ListItemText
-                                            primary={`Compra $${r.precio_compra} - Venta $${r.precio_venta}`}
-                                            secondary={`${r.proveedor} - ${this.formatDate(r.fecha)}`}
+                                            primary={`Precio $${r.precio_venta} - ${this.formatDate(r.fecha)}`}
+                                            secondary={`${r.descripcion}`}
                                         />
                                     </ListItem>
                                 )}

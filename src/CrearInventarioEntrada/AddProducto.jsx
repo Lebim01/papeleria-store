@@ -77,7 +77,6 @@ class AddProducto extends React.Component {
 
     render(){
         const { id_producto, producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta, utilidad } = this.props
-
         return (
             <TableRow>
                 <TableCell padding={'dense'}>
@@ -150,6 +149,17 @@ class AddProducto extends React.Component {
                 </TableCell>
                 <TableCell padding={'dense'}>
                     <TextField
+                        value={utilidad}
+                        fullWidth={true}
+                        onChange={this.handleChange('utilidad')}
+                        id="utilidad"
+                        InputProps={{
+                            type : 'number'
+                        }}
+                    />
+                </TableCell>
+                <TableCell padding={'dense'}>
+                    <TextField
                         value={precio_venta}
                         fullWidth={true}
                         onChange={this.handleChange('precio_venta')}
@@ -174,6 +184,7 @@ AddProducto.defaultProps = {
     id_producto : '',
     id_marca : '',
     cantidad : 0,
+    utilidad : 0,
     index : -1,
     marcas : [],
     placeholder_compra : '',

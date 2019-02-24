@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 let HOST = `https://api-papeleria.teknovatemzt.com/index.php`
+=======
+let HOST = `http://localhost/index.php`
+>>>>>>> e0623dae4ed0fbd70b2532a821cc1f141fb97c7e
 
 module.exports = {
     LOGIN : `${HOST}/admin/login`,

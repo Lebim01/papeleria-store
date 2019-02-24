@@ -57,6 +57,7 @@ class Crear extends React.Component {
 
         this.add = this.add.bind(this)
         this.save = this.save.bind(this)
+        this.changeTotals = this.changeTotals.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.deleteProduct = this.deleteProduct.bind(this)
         this.handleAddProduct = this.handleAddProduct.bind(this)
@@ -185,6 +186,26 @@ class Crear extends React.Component {
     handleCloseHistoryPrice(){
         this.setState({
             openHistoryPrice : false
+        })
+    }
+
+    suggestedPrice(){
+
+    }
+
+    changeTotals(){
+        const { descuento, list } = this.state
+
+        const _subtotal = this.round(list.reduce((a, b) => a + (b.cantidad * (b.precio_compra || b.placeholder_compra)), 0) || 0)
+        const _iva = this.round(_subtotal * 0.16)
+        const _descuento = this.round((_subtotal + _iva) * (descuento / 100))
+        const _total = this.round(_subtotal + _iva - _descuento)
+
+        this.setState({
+            _subtotal,
+            _iva,
+            _descuento,
+            _total
         })
     }
 
