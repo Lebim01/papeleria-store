@@ -2,15 +2,11 @@
 
 # dependencies
 /node_modules
-/build
 /README.md
 /yarn.lock
 
 # testing
 /coverage
-
-# production
-/build
 
 # misc
 .DS_Store

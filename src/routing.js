@@ -34,7 +34,6 @@ module.exports = {
     ONE_CLIENTS : `${HOST}/clientes/one`,
     SAVE_CLIENTS : `${HOST}/clientes/save`,
     DELETE_CLIENTS : `${HOST}/clientes/delete`,
-
     LIST_MARCAS : `${HOST}/marcas/list`,
     ONE_MARCAS : `${HOST}/marcas/one`,
     SAVE_MARCAS : `${HOST}/marcas/save`,
