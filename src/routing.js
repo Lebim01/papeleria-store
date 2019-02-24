@@ -1,4 +1,4 @@
-let HOST = `http://papeleria.test/index.php`
+let HOST = `https://api-papeleria.teknovatemzt.com/index.php`
 
 module.exports = {
     LOGIN : `${HOST}/admin/login`,
@@ -6,6 +6,10 @@ module.exports = {
 
     INVENTORY : `${HOST}/inventario`,
     ADD_INVENTORY : `${HOST}/inventario/save`,
+    SUGGESTED_PRICES : `${HOST}/inventario/suggestedPrices`,
+
+    SALES : `${HOST}/ventas`,
+    ADD_SALE : `${HOST}/ventas/save`,
 
     LIST_LINEAS : `${HOST}/lineas/list`,
     ONE_LINEAS : `${HOST}/lineas/one`,

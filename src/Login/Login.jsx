@@ -102,7 +102,7 @@ class Logo extends React.Component {
         return (
             <div className="logo">
                 <i className="fa fa-universal-access" aria-hidden="true"></i> 
-                <span>Carmin</span>
+                <span>Papeleria</span>
             </div>
         )
     }

@@ -1,44 +1,33 @@
 import React from 'react'
 import axios from 'axios'
 import TableUI from './../components/TableUI'
-import { LIST_SELL } from './../routing'
+import { SALES } from './../routing'
 import {
     RegularCard
 } from './../components';
 import Loader from 'react-loader'
 // COMPONENTS
-import { TableCell, TableRow } from 'material-ui/Table';
-import Button from 'material-ui/Button';
-import Typography from 'material-ui/Typography';
-import toastr from 'toastr'
+import {
+    Button, TableCell, TableRow, Tooltip, Fab
+} from '@material-ui/core'
+import AddIcon from '@material-ui/icons/Add'
 
 const columnData = [
-    { id: 'folio', label: 'Folio', sortable : true, filterable : true },
+    { id: 'factura', label: 'Factura', sortable : true, filterable : true },
     { id: 'fecha', label: 'Fecha', sortable : true, filterable : true },
     { id: 'cliente', label: 'Cliente', sortable : true, filterable : true },
-    { id: 'cliente_email', label: 'Email Cliente', sortable : true, filterable : true },
-    { id: 'status_pago', label: 'Estatus', sortable : true, filterable : true },
+    { id: 'total', label: 'Total $', sortable : true, filterable : true },
     { id: 'actions', label : 'Acciones', sortable : false, style : { minWidth : 150 } }
 ];
+
+const goAdd = () => {
+    window.location = '#/ventas/create'
+}
 
 class Ventas extends React.Component {
     state = {
         data : [],
         loading : true
-    }
-
-    constructor(props){
-        super(props)
-        this.go = this.go.bind(this)
-    }
-
-    go = (id) => {
-        this.props.history.push({
-            pathname: '/ventas/create',
-            state : {
-                id : id
-            }
-        })
     }
 
     RowFormat = props => {
@@ -48,11 +37,10 @@ class Ventas extends React.Component {
                 tabIndex={-1}
                 key={props.id}
             >
-                <TableCell>{props.folio}</TableCell>
+                <TableCell>{props.factura}</TableCell>
                 <TableCell>{props.fecha}</TableCell>
                 <TableCell>{props.cliente}</TableCell>
-                <TableCell>{props.cliente_email}</TableCell>
-                <TableCell>{props.status_pago}</TableCell>
+                <TableCell>{props.total}</TableCell>
                 <TableCell>
                     <Button onClick={()=>this.go(props.id)}>
                         Ver
@@ -63,7 +51,7 @@ class Ventas extends React.Component {
     }
     
     componentDidMount(){
-        axios.post(LIST_SELL)
+        axios.post(SALES)
         .then((r) => {
             this.setState({
                 data : r.data,
@@ -96,6 +84,11 @@ class Ventas extends React.Component {
                     }}
                     content = {
                         <div>
+                            <Tooltip title="Agregar">
+                                <Fab variant="fab" color="secondary" aria-label="Add" size="small" style={{float:'right'}} onClick={goAdd}>
+                                    <AddIcon />
+                                </Fab>
+                            </Tooltip>
                             <TableUI 
                                 RowFormat={this.RowFormat}
                                 order={'asc'}

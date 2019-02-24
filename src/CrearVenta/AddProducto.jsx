@@ -118,38 +118,6 @@ class AddProducto extends React.Component {
                 </TableCell>
                 <TableCell padding={'dense'}>
                     <TextField
-                        value={precio_compra}
-                        fullWidth={true}
-                        onChange={this.handleChange('precio_compra')}
-                        id="precio_compra"
-                        placeholder={placeholder_compra}
-                        InputProps={{
-                            inputComponent: NumberFormatCustom
-                        }}
-                    />
-                </TableCell>
-                <TableCell padding={'dense'} style={{width: 100, maxWidth: 100}}>
-                    <CustomInput
-                        id="utilidad"
-                        formControlProps={{
-                            style : {
-                                margin: 0
-                            },
-                            fullWidth : true
-                        }}
-                        classes={{
-                            underline : '#000'
-                        }}
-                        inputProps={{
-                            onChange: this.handleChange('utilidad'),
-                            value : utilidad,
-                            type : 'number',
-                            min : 1
-                        }}
-                    />
-                </TableCell>
-                <TableCell padding={'dense'}>
-                    <TextField
                         value={precio_venta}
                         fullWidth={true}
                         onChange={this.handleChange('precio_venta')}

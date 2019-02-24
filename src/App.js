@@ -36,6 +36,7 @@ import CrearInventarioEntrada from './CrearInventarioEntrada'
 import VentasIcon from '@material-ui/icons/CreditCard'
 import Ventas from './Ventas'
 import VerVenta from './VerVenta'
+import CrearVenta from './CrearVenta'
 
 const theme = createMuiTheme(require('./theme'));
 
@@ -107,7 +108,7 @@ class App extends Component {
                         <Resource 
                             name="ventas" 
                             list={Ventas}
-                            create={VerVenta}
+                            create={CrearVenta}
                             icon={VentasIcon}
                             options={{ label: 'Ventas' }}/>
 

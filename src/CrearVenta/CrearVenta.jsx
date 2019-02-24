@@ -16,14 +16,13 @@ import {
     TableRow, 
     Tooltip
 } from '@material-ui/core'
-import './CrearInventarioEntrada.css'
+import './CrearVenta.css'
 import axios from 'axios'
 import toastr from 'toastr'
 import { ADD_INVENTORY, ONE_PRODUCTS } from './../routing'
 import { UNEXPECTED } from './../dictionary'
 import DialogAddProduct from './DialogAddProduct';
 import AddProducto from './AddProducto'
-import DialogHistoryPrice from './DialogHistoryPrice'
 
 const styles = {
     underline : {
@@ -42,14 +41,12 @@ const styles = {
 
 class Crear extends React.Component {
     state = { 
-        list : [], 
-        historyPrices : [],
+        list : [],
         factura : '', 
-        proveedor : '', 
+        cliente : 'CLIENTE DE MOSTRADOR', 
         producto : '',
         descuento : '',
-        openAddProduct : false,
-        openHistoryPrice : false
+        openAddProduct : false
     }
 
     constructor(props){
@@ -61,8 +58,6 @@ class Crear extends React.Component {
         this.deleteProduct = this.deleteProduct.bind(this)
         this.handleAddProduct = this.handleAddProduct.bind(this)
         this.handleCloseAddProduct = this.handleCloseAddProduct.bind(this)
-        this.openModalHistoryPrice = this.openModalHistoryPrice.bind(this)
-        this.handleCloseHistoryPrice = this.handleCloseHistoryPrice.bind(this)
     }
 
     calculateTotals(){
@@ -175,21 +170,8 @@ class Crear extends React.Component {
         return Math.round(value * 100) / 100
     }
 
-    openModalHistoryPrice(data){
-        this.setState({
-            openHistoryPrice : true,
-            historyPrices : data
-        })
-    }
-
-    handleCloseHistoryPrice(){
-        this.setState({
-            openHistoryPrice : false
-        })
-    }
-
     render(){
-        const { list, factura, proveedor, descuento, _subtotal, _iva, _total, _descuento } = this.state
+        const { list, factura, cliente, descuento, _subtotal, _iva, _total, _descuento } = this.state
         const { black } = this.props
         const validos = list.filter(product => 
             product.id_producto > 0 &&
@@ -208,17 +190,10 @@ class Crear extends React.Component {
                     handleAdd={this.handleAddProduct}
                 />
 
-                <DialogHistoryPrice
-                    open={this.state.openHistoryPrice}
-                    handleClose={this.handleCloseHistoryPrice}
-                    data={this.state.historyPrices}
-                />
-
                 <Grid container>
                     <ItemGrid xs={12} sm={12} md={12}>
                         <RegularCard
-                            cardTitle="Crear Entrada de Inventario"
-                            cardSubtitle="Completa la información"
+                            cardTitle="Crear Venta"
                             headerColor='red'
                             classes={{
                                 cardHeader : 'RegularCard-cardTitle-101'
@@ -240,10 +215,10 @@ class Crear extends React.Component {
                                         </Grid>
                                         <Grid item xs={12} md={4} className={styles.paper}>
                                             <TextField
-                                                label="Proveedor"
+                                                label="Cliente"
                                                 className={styles.textField}
-                                                value={proveedor}
-                                                onChange={this.handleChangeInput('proveedor')}
+                                                value={cliente}
+                                                onChange={this.handleChangeInput('cliente')}
                                                 fullWidth
                                                 InputLabelProps={{
                                                     shrink: true,
@@ -295,27 +270,13 @@ class Crear extends React.Component {
                                                 <TableCell padding={'dense'}>
                                                     Producto
                                                 </TableCell>
-                                                <TableCell padding={'dense'}>Cantidad</TableCell>
                                                 <TableCell padding={'dense'} style={{width : 200}}>
-                                                    $ Precio Compra&nbsp;&nbsp;
-                                                    <Tooltip title="Al quedar vació tomara como valor el ultimo precio registrado">
-                                                        <span className="badge badge-warning text-light">
-                                                            <i className="fa fa-info"></i> 
-                                                        </span>
-                                                    </Tooltip>
-                                                </TableCell>
-                                                <TableCell style={{width : 150}}>
-                                                    % Utilidad
+                                                    Cantidad
                                                 </TableCell>
                                                 <TableCell padding={'dense'} style={{width : 200}}>
-                                                    $ Precio Venta&nbsp;&nbsp;
-                                                    <Tooltip title="Al quedar vació tomara como valor el ultimo precio registrado">
-                                                        <span className="badge badge-warning text-light">
-                                                            <i className="fa fa-info"></i> 
-                                                        </span>
-                                                    </Tooltip>
+                                                    $ Precio Venta
                                                 </TableCell>
-                                                <TableCell padding={'dense'}></TableCell>
+                                                <TableCell padding={'dense'} style={{width : 200}}></TableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -327,7 +288,6 @@ class Crear extends React.Component {
                                                     black={black}
                                                     handleChange={this.handleChange}
                                                     deleteProduct={this.deleteProduct}
-                                                    openModalHistoryPrice={this.openModalHistoryPrice}
                                                 /> 
                                             ) }
                                         </TableBody>
