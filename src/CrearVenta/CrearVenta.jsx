@@ -19,10 +19,11 @@ import {
 import './CrearVenta.css'
 import axios from 'axios'
 import toastr from 'toastr'
-import { ADD_INVENTORY, ONE_PRODUCTS } from './../routing'
+import { ADD_SALE, ONE_PRODUCTS } from './../routing'
 import { UNEXPECTED } from './../dictionary'
 import DialogAddProduct from './DialogAddProduct';
 import AddProducto from './AddProducto'
+import DialogHistoryPrice from '../CrearInventarioEntrada/DialogHistoryPrice'
 
 const styles = {
     underline : {
@@ -46,7 +47,8 @@ class Crear extends React.Component {
         cliente : 'CLIENTE DE MOSTRADOR', 
         producto : '',
         descuento : '',
-        openAddProduct : false
+        openAddProduct : false,
+        historyPrices : []
     }
 
     constructor(props){
@@ -58,11 +60,13 @@ class Crear extends React.Component {
         this.deleteProduct = this.deleteProduct.bind(this)
         this.handleAddProduct = this.handleAddProduct.bind(this)
         this.handleCloseAddProduct = this.handleCloseAddProduct.bind(this)
+        this.openModalHistoryPrice = this.openModalHistoryPrice.bind(this)
+        this.handleCloseHistoryPrice = this.handleCloseHistoryPrice.bind(this)
     }
 
     calculateTotals(){
         const { list } = this.state
-        const _subtotal = this.round(list.reduce((a, b) => a + (b.cantidad * (b.precio_compra || b.placeholder_compra)), 0) || 0)
+        const _subtotal = this.round(list.reduce((a, b) => a + (b.cantidad * (b.precio_venta || b.placeholder_venta)), 0) || 0)
         const _iva = this.round(_subtotal * 0.16)
         const _descuento = this.round((_subtotal + _iva) * (this.state.descuento / 100))
         const _total = this.round(_subtotal + _iva - _descuento)
@@ -92,19 +96,19 @@ class Crear extends React.Component {
     }
 
     goList(){
-        window.location = '#/inventario'
+        window.location = '#/ventas'
     }
 
     save(e){
         e.preventDefault()
         const _products = this.state.list
-        const { factura, proveedor, descuento, _descuento, _subtotal, _iva, _total } = this.state
+        const { factura, cliente, descuento, _descuento, _subtotal, _iva, _total } = this.state
         if(_products.length > 0){
             const params = {
                 productos: _products, 
                 token : localStorage.getItem('token'),
                 factura,
-                proveedor,
+                cliente,
                 descuento_porcentaje : descuento,
 
                 descuento : _descuento,
@@ -112,7 +116,7 @@ class Crear extends React.Component {
                 iva : _iva,
                 total:  _total
             }
-            axios.post(ADD_INVENTORY, params)
+            axios.post(ADD_SALE, params)
             .then(({data}) => {
                 if(data.status === 200){
                     toastr.success(`Se guardo con éxito`)
@@ -148,7 +152,7 @@ class Crear extends React.Component {
         let exists = this.state.list.filter((p) => p.id_producto == id_producto).length > 0
         if(!exists){
             let product = (await axios.post(ONE_PRODUCTS, { id: id_producto })).data
-            list.push({ id_producto, producto : product.nombre, cantidad : 0, placeholder_compra : precio_compra, placeholder_venta : precio_venta })
+            list.push({ id_producto, producto : product.nombre, cantidad : 0, placeholder_compra : precio_compra, placeholder_venta : precio_venta, inventario : product.inventario })
             this.setState({
                 list,
                 openAddProduct : false
@@ -170,6 +174,19 @@ class Crear extends React.Component {
         return Math.round(value * 100) / 100
     }
 
+    openModalHistoryPrice(data){
+        this.setState({
+            openHistoryPrice : true,
+            historyPrices : data
+        })
+    }
+
+    handleCloseHistoryPrice(){
+        this.setState({
+            openHistoryPrice : false
+        })
+    }
+
     render(){
         const { list, factura, cliente, descuento, _subtotal, _iva, _total, _descuento } = this.state
         const { black } = this.props
@@ -177,7 +194,8 @@ class Crear extends React.Component {
             product.id_producto > 0 &&
             (product.cantidad > 0 || product.cantidad < 0) &&
             (product.precio_compra > 0 || product.placeholder_compra > 0) &&
-            (product.precio_venta > 0 || product.placeholder_venta > 0)
+            (product.precio_venta > 0 || product.placeholder_venta > 0) &&
+            (product.cantidad <= product.inventario)
         )
         const isValid = validos.length == list.length && list.length > 0
 
@@ -188,6 +206,12 @@ class Crear extends React.Component {
                     open={this.state.openAddProduct}
                     handleClose={this.handleCloseAddProduct}
                     handleAdd={this.handleAddProduct}
+                />
+
+                <DialogHistoryPrice
+                    open={this.state.openHistoryPrice}
+                    handleClose={this.handleCloseHistoryPrice}
+                    data={this.state.historyPrices}
                 />
 
                 <Grid container>
@@ -288,6 +312,7 @@ class Crear extends React.Component {
                                                     black={black}
                                                     handleChange={this.handleChange}
                                                     deleteProduct={this.deleteProduct}
+                                                    openModalHistoryPrice={this.openModalHistoryPrice}
                                                 /> 
                                             ) }
                                         </TableBody>

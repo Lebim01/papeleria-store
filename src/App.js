@@ -109,6 +109,7 @@ class App extends Component {
                             name="ventas" 
                             list={Ventas}
                             create={CrearVenta}
+                            edit={VerVenta}
                             icon={VentasIcon}
                             options={{ label: 'Ventas' }}/>
 

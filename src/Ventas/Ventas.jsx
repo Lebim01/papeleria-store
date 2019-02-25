@@ -30,6 +30,10 @@ class Ventas extends React.Component {
         loading : true
     }
 
+    go(id){
+        window.location = '#/ventas/show?id='+id
+    }
+
     RowFormat = props => {
         return (
             <TableRow

@@ -5,7 +5,7 @@ import {
 import axios from 'axios'
 import Loader from 'react-loader'
 import { withStyles } from 'material-ui/styles';
-import { SELL_ONE, SAVE_SELL } from './../routing'
+import { SELL_ONE } from './../routing'
 import Select from 'material-ui/Select';
 import { MenuItem } from 'material-ui/Menu';
 import {
@@ -14,8 +14,6 @@ import {
 import green from 'material-ui/colors/green';
 import classNames from 'classnames';
 import AddIcon from '@material-ui/icons/Save';
-import { UNEXPECTED } from './../dictionary'
-import toastr from 'toastr'
 
 const styles = theme => ({
     fab: {
@@ -43,19 +41,20 @@ class VerVenta extends React.Component {
         }
     }
 
-    constructor(props){
-        super(props)
-
-        this.handleChange = this.handleChange.bind(this)
-        this.save = this.save.bind(this)
-        if(props.history.location.state){
-            this.state.id = props.history.location.state.id
-        }
+    getId(param = 'id'){
+        let params = window.location.href.split('?')[1]
+        params = params.split('&')
+        let value = params.filter(r => {
+            let entries = r.split('=')
+            return entries[0] == param
+        })[0]
+        return parseInt(value.split('=')[1]) || 0
     }
 
     componentDidMount(){
-        if(this.state.id > 0){
-            axios.post(SELL_ONE, {id: this.state.id})
+        console.log('mount')
+        if(this.getId() > 0){
+            axios.post(SELL_ONE, {id: this.getId()})
             .then((r) => {
                 this.setState({
                     data : r.data,
@@ -70,34 +69,6 @@ class VerVenta extends React.Component {
         }
     }
 
-    handleChange = (name) => e => {
-        let data = this.state.data
-        data[name] = e.target.value
-        this.setState({
-            data,
-            validSave : true
-        })
-    }
-
-    save = () => {
-        this.setState({
-            loading: true
-        })
-
-        axios.post(SAVE_SELL, { status : this.state.data.status_pago, id : this.state.id })
-        .then((r) => {
-            this.setState({
-                loading : false,
-                validSave : false
-            })
-
-            toastr.success('Guardado con éxito')
-        })
-        .catch(e => {
-            toastr.error(UNEXPECTED)
-        })
-    }
-
     render(){
         const { loading, data, validSave, id } = this.state
         const { classes } = this.props
@@ -110,7 +81,7 @@ class VerVenta extends React.Component {
                     loadedClassName="loadedContent" />
 
                 <RegularCard
-                    cardTitle={"Venta #"+data.folio}
+                    cardTitle={"Venta #"+data.factura}
                     headerColor='red'
                     classes={{
                         cardHeader : 'RegularCard-cardTitle-101'
@@ -133,11 +104,21 @@ class VerVenta extends React.Component {
                                         <div className="form-group">
                                             <div className="col-md-4 inline-block">
                                                 <label htmlFor="" className="label-control">
-                                                    Folio
+                                                    Factura
                                                 </label>
                                             </div>
                                             <div className="col-md-8 inline-block text-left">
-                                                { data.folio }
+                                                { data.factura }
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <div className="col-md-4 inline-block">
+                                                <label htmlFor="" className="label-control">
+                                                    Cliente
+                                                </label>
+                                            </div>
+                                            <div className="col-md-8 inline-block text-left">
+                                                { data.cliente }
                                             </div>
                                         </div>
                                         <div className="form-group">
@@ -153,31 +134,31 @@ class VerVenta extends React.Component {
                                         <div className="form-group">
                                             <div className="col-md-4 inline-block">
                                                 <label htmlFor="" className="label-control">
-                                                    Dirección
+                                                    Subtotal
                                                 </label>
                                             </div>
                                             <div className="col-md-8 inline-block text-left">
-                                                { data.direccion }
+                                                $ { data.subtotal }
                                             </div>
                                         </div>
                                         <div className="form-group">
                                             <div className="col-md-4 inline-block">
                                                 <label htmlFor="" className="label-control">
-                                                    Costo Envío
+                                                    Iva
                                                 </label>
                                             </div>
                                             <div className="col-md-8 inline-block text-left">
-                                                $ { data.envio }
+                                                $ { data.iva }
                                             </div>
                                         </div>
                                         <div className="form-group">
                                             <div className="col-md-4 inline-block">
                                                 <label htmlFor="" className="label-control">
-                                                    Costo Productos
+                                                    Descuento
                                                 </label>
                                             </div>
                                             <div className="col-md-8 inline-block text-left">
-                                                $ { data.total_prod }
+                                                $ { data.descuento }
                                             </div>
                                         </div>
                                         <div className="form-group">
@@ -190,84 +171,14 @@ class VerVenta extends React.Component {
                                                 $ { data.total }
                                             </div>
                                         </div>
-                                        <div className="form-group">
-                                            <div className="col-md-4 inline-block">
-                                                <label htmlFor="" className="label-control">
-                                                    Estatus
-                                                </label>
-                                            </div>
-                                            <div className="col-md-8 inline-block text-left">
-                                                <Select
-                                                    value={data.status_pago}
-                                                    onChange={this.handleChange('status_pago')}
-                                                    style={{textAlign : 'left'}}
-                                                    inputProps={{
-                                                        name: 'status',
-                                                        id: 'status'
-                                                    }}
-                                                >
-                                                    <MenuItem value={'Pendiente de pago'}>Pendiente de pago</MenuItem>
-                                                    <MenuItem value={'Pagada'}>Pagada</MenuItem>
-                                                    <MenuItem value={'Cancelada'}>Cancelada</MenuItem>
-                                                </Select>
-                                            </div>
-                                        </div>
-                                    </fieldset>
-                                </div>
-                                <div className="col-md-6">
-                                    <fieldset>
-                                        <legend>Información del cliente</legend>
-                                        <div className="form-group">
-                                            <div className="col-md-4 inline-block">
-                                                <label htmlFor="" className="label-control">
-                                                    Nombre
-                                                </label>
-                                            </div>
-                                            <div className="col-md-8 inline-block text-left">
-                                                { data.cliente }
-                                            </div>
-                                        </div>
-                                        <div className="form-group">
-                                            <div className="col-md-4 inline-block">
-                                                <label htmlFor="" className="label-control">
-                                                    Email
-                                                </label>
-                                            </div>
-                                            <div className="col-md-8 inline-block text-left">
-                                                { data.cliente_email }
-                                            </div>
-                                        </div>
                                     </fieldset>
                                 </div>
                             </div>
-                            <br/>
-                            <br/>
-                            <h4>Comprobantes</h4>
-                            <table className="table">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha de subida</th>
-                                        <th>Archivo</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    { data.comprobantes.map((c, i) => 
-                                        <tr>
-                                            <td>{c.fecha}</td>
-                                            <td>
-                                                <a href={'/'+c.pathfile} download>Descargar</a>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                            <br/>
                             <br/>
                             <h4>Detalle de Productos</h4>
                             <table className="table">
                                 <thead>
                                     <tr>
-                                        <th></th>
                                         <th>Producto</th>
                                         <th>Cantidad</th>
                                         <th>Precio</th>
@@ -277,17 +188,6 @@ class VerVenta extends React.Component {
                                 <tbody>
                                     { data.productos.map((p, i) => 
                                         <tr key={i}>
-                                            <td>
-                                                <div style={{
-                                                    display : 'inline-block',
-                                                    width : 200,
-                                                    height : 150,
-                                                    backgroundSize: 'contain',
-                                                    backgroundRepeat : 'no-repeat',
-                                                    backgroundImage : `url(${p.image})`
-                                                 }}>
-                                                </div>
-                                            </td>
                                             <td>{p.nombre}</td>
                                             <td>{p.cantidad}</td>
                                             <td>${p.precio}</td>

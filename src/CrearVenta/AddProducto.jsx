@@ -46,26 +46,10 @@ class AddProducto extends React.Component {
     }
 
     handleChange = (name) => async (event) => {
-        const { id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta, utilidad } = this.props
-        let data = { id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta, utilidad }
+        const { id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta, utilidad, inventario } = this.props
+        let data = { id_producto, cantidad, precio_compra, precio_venta, placeholder_compra, placeholder_venta, utilidad, inventario }
         data[name] = event.target.value
-
-        if(name === 'precio_compra' || name === 'cantidad' || name === 'utilidad'){
-            const { precio_compra, precio_venta } = await this.calcularPrecios({
-                precio_compra : data.precio_compra,
-                cantidad : data.cantidad,
-                utilidad : data.utilidad
-            })
-            data.placeholder_compra = precio_compra
-            data.placeholder_venta = precio_venta
-        }
         this.props.handleChange(data, this.props.index)
-    }
-
-    async calcularPrecios({ cantidad, precio_compra, utilidad }){
-        const { id_producto } = this.props
-        const r = await axios.post(SUGGESTED_PRICES, { id_producto, cantidad, precio_compra, utilidad })
-        return r.data || { precio_compra : '', precio_venta : '' }
     }
 
     async historyPrice(){
@@ -76,7 +60,7 @@ class AddProducto extends React.Component {
     }
 
     render(){
-        const { id_producto, producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta, utilidad } = this.props
+        const { id_producto, producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta, utilidad, inventario } = this.props
 
         return (
             <TableRow>
@@ -97,23 +81,16 @@ class AddProducto extends React.Component {
                     />
                 </TableCell>
                 <TableCell padding={'dense'} style={{width: 100, maxWidth: 100}}>
-                    <CustomInput
-                        id="cantidad"
-                        formControlProps={{
-                            style : {
-                                margin: 0
-                            },
-                            fullWidth : true
-                        }}
-                        classes={{
-                            underline : '#000'
-                        }}
+                    <TextField
+                        value={cantidad}
+                        fullWidth={true}
+                        onChange={this.handleChange('cantidad')}
                         inputProps={{
-                            onChange: this.handleChange('cantidad'),
-                            value : cantidad,
                             type : 'number',
-                            min : 1
+                            value : cantidad
                         }}
+                        helperText={"Disponible " + inventario}
+                        error={cantidad > inventario}
                     />
                 </TableCell>
                 <TableCell padding={'dense'}>

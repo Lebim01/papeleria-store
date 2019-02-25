@@ -1,4 +1,4 @@
-let HOST = `https://api-papeleria.teknovatemzt.com:444/index.php`
+let HOST = `http://papeleria.test/index.php`
 
 module.exports = {
     LOGIN : `${HOST}/admin/login`,
@@ -10,6 +10,8 @@ module.exports = {
 
     SALES : `${HOST}/ventas`,
     ADD_SALE : `${HOST}/ventas/save`,
+    LIST_SELL : `${HOST}/ventas/list`,
+    SELL_ONE : `${HOST}/ventas/one`,
 
     LIST_LINEAS : `${HOST}/lineas/list`,
     ONE_LINEAS : `${HOST}/lineas/one`,
@@ -38,25 +40,6 @@ module.exports = {
     ONE_MARCAS : `${HOST}/marcas/one`,
     SAVE_MARCAS : `${HOST}/marcas/save`,
     DELETE_MARCAS : `${HOST}/marcas/delete`,
-
-    LIST_SELL : `${HOST}/ventas/list`,
-    SELL_ONE : `${HOST}/ventas/one`,
-    SAVE_SELL : `${HOST}/ventas/save`,
-
-    LIST_BLOC : `${HOST}/bloc/list`,
-    ONE_BLOC : `${HOST}/bloc/one`,
-    SAVE_BLOC : `${HOST}/bloc/save`,
-    DELETE_BLOC : `${HOST}/bloc/delete`,
-
-    LIST_FAMOUS : `${HOST}/famous/list`,
-    ONE_FAMOUS : `${HOST}/famous/one`,
-    DELETE_FAMOUS : `${HOST}/famous/delete`,
-    SAVE_FAMOUS : `${HOST}/famous/save`,
-
-    ONE_MASTER : `${HOST}/master/one`,
-    SAVE_MASTER : `${HOST}/master/save`,
-    UP_IMAGE_MASTER : `${HOST}/master/upImage`,
-    DELETE_IMAGE_MASTER : `${HOST}/master/deleteImage`,
 
     ONE_INICIO : `${HOST}/inicio/one`,
     UP_IMAGE_INICIO : `${HOST}/inicio/upImage`,

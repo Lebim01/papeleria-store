@@ -1,2 +1,2 @@
-import Ver from './VerVenta'
-export default Ver
+import VerVenta from './VerVenta';
+export default VerVenta

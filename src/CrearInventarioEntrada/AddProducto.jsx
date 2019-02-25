@@ -149,17 +149,6 @@ class AddProducto extends React.Component {
                 </TableCell>
                 <TableCell padding={'dense'}>
                     <TextField
-                        value={utilidad}
-                        fullWidth={true}
-                        onChange={this.handleChange('utilidad')}
-                        id="utilidad"
-                        InputProps={{
-                            type : 'number'
-                        }}
-                    />
-                </TableCell>
-                <TableCell padding={'dense'}>
-                    <TextField
                         value={precio_venta}
                         fullWidth={true}
                         onChange={this.handleChange('precio_venta')}
