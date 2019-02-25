@@ -140,42 +140,6 @@ class Crear extends React.Component {
                                                 onChange={this.onChange}
                                             />
                                         </ItemGrid>
-                                        <ItemGrid md={6}>
-                                            <div className="text-center">
-                                                Banner
-                                                <ImageUploader
-                                                    withIcon={false}
-                                                    withLabel={false}
-                                                    singleImage={true}
-
-                                                    buttonText='Elige una imagen'
-                                                    onChange={this.onDropBanner}
-                                                    imgExtension={['.jpg', '.jpeg', '.png', '.gif']}
-                                                    maxFileSize={5242880}
-                                                    label="Max tamaño del archvio: 5mb, acepta: jpg|jpeg|png|gif"
-                                                />
-                                                { this.state.banner64 && 
-                                                    <img style={{maxWidth : '100%', margin : 'auto'}} src={this.state.banner64} className="img-responsive" alt="" />
-                                                }
-                                            </div>
-                                            <div className="text-center">
-                                                Logo
-                                                <ImageUploader
-                                                    withIcon={false}
-                                                    withLabel={false}
-                                                    singleImage={true}
-
-                                                    buttonText='Elige una imagen'
-                                                    onChange={this.onDrop}
-                                                    imgExtension={['.jpg', '.jpeg', '.png']}
-                                                    maxFileSize={5242880}
-                                                    label="Max tamaño del archvio: 5mb, acepta: jpg|jpeg|png"
-                                                />
-                                                { this.state.pictures64 && 
-                                                    <img style={{maxWidth : '100%', margin : 'auto'}} src={this.state.pictures64} className="img-responsive" alt="" />
-                                                }
-                                            </div>
-                                        </ItemGrid>
                                     </Grid>
                                 </div>
                             }
