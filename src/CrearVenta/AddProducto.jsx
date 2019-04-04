@@ -90,7 +90,6 @@ class AddProducto extends React.Component {
                             value : cantidad
                         }}
                         helperText={"Disponible " + inventario}
-                        error={cantidad > inventario}
                     />
                 </TableCell>
                 <TableCell padding={'dense'}>
