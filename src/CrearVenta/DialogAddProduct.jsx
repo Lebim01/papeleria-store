@@ -143,6 +143,11 @@ class DialogAddProduct extends React.Component {
                 maxWidth={'md'}
                 open={this.props.open}
                 onEnter={this.onEnter}
+                PaperProps={{
+                    style: {
+                        overflowY : 'visible'
+                    },
+                }}
             >
                 <DialogTitle id="customized-dialog-title" onClose={this.props.handleClose}>
                     Buscar Producto

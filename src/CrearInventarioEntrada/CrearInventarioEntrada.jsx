@@ -19,11 +19,12 @@ import {
 import './CrearInventarioEntrada.css'
 import axios from 'axios'
 import toastr from 'toastr'
-import { ADD_INVENTORY, ONE_PRODUCTS } from './../routing'
+import { ADD_INVENTORY, ONE_PRODUCTS, SUGGESTED_PRICES, GET_PRODUCT_CODE } from './../routing'
 import { UNEXPECTED } from './../dictionary'
 import DialogAddProduct from './DialogAddProduct';
 import AddProducto from './AddProducto'
 import DialogHistoryPrice from './DialogHistoryPrice'
+import InputCodigo from './InputCodigo'
 
 const styles = {
     underline : {
@@ -49,7 +50,8 @@ class Crear extends React.Component {
         producto : '',
         descuento : '',
         openAddProduct : false,
-        openHistoryPrice : false
+        openHistoryPrice : false,
+        errorCode : false
     }
 
     constructor(props){
@@ -64,6 +66,8 @@ class Crear extends React.Component {
         this.handleCloseAddProduct = this.handleCloseAddProduct.bind(this)
         this.openModalHistoryPrice = this.openModalHistoryPrice.bind(this)
         this.handleCloseHistoryPrice = this.handleCloseHistoryPrice.bind(this)
+        this.handleKeyPress = this.handleKeyPress.bind(this)
+        this.validCodeProduct = this.validCodeProduct.bind(this)
     }
 
     calculateTotals(){
@@ -157,6 +161,7 @@ class Crear extends React.Component {
             list.push({ id_producto, producto : product.nombre, cantidad : 0, placeholder_compra : precio_compra, placeholder_venta : precio_venta })
             this.setState({
                 list,
+                codigo : '',
                 openAddProduct : false
             })
         }else{
@@ -207,6 +212,46 @@ class Crear extends React.Component {
             _descuento,
             _total
         })
+    }
+
+    handleKeyPress = (event) => {
+        if (event.key === 'Enter'){ 
+            event.preventDefault();
+            this.validCodeProduct()
+        }
+    }
+
+    validCodeProduct = async () => {
+        try {
+            let { data } = await axios.post(GET_PRODUCT_CODE, { code : this.state.codigo })
+            if(data.id){
+                this.setState({
+                    errorCode : false,
+                    id_producto : data.id
+                })
+                this.handleAdd()
+            }else{
+                throw 'Producto no conocido'
+            }
+        }catch(e){
+            this.setState({
+                errorCode : true,
+                errorCodeMessage : e
+            })
+        }
+    }
+
+    handleAdd = async () => {
+        if(this.state.id_producto){
+            const { precio_compra, precio_venta } = await this.calcularPrecios()
+            this.handleAddProduct({ precio_compra, precio_venta, ...this.state })
+        }
+    }
+
+    async calcularPrecios(){
+        const { id_producto, } = this.state
+        const r = await axios.post(SUGGESTED_PRICES, { id_producto, cantidad : 0, precio_compra : null })
+        return r.data || { precio_compra : '', precio_venta : '' }
     }
 
     render(){
@@ -290,6 +335,14 @@ class Crear extends React.Component {
                                     </Grid>
                                     <hr/>
                                     <Grid container spacing={24} className={styles.row}>
+                                        <Grid item xs={12} md={4} className={styles.paper}>
+                                            <InputCodigo 
+                                                handleChangeInput={this.handleChangeInput}
+                                                handleKeyPress={this.handleKeyPress}
+                                                codigo={this.state.codigo}
+                                                errorCode={this.state.errorCode}
+                                            />
+                                        </Grid>
                                         <Grid item xs={12} md={4} className={styles.paper}>
                                             <Button classes={{ button: 'text-body primary' }} onClick={this.add}>
                                                 Agregar Producto &nbsp;&nbsp;<i className="fa fa-plus"></i>
