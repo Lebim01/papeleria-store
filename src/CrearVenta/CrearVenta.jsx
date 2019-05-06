@@ -25,6 +25,7 @@ import DialogAddProduct from './DialogAddProduct';
 import AddProducto from './AddProducto'
 import DialogHistoryPrice from '../CrearInventarioEntrada/DialogHistoryPrice'
 import InputCodigo from './InputCodigo'
+import DelayInput from './DelayInput'
 
 const styles = {
     underline : {
@@ -49,7 +50,9 @@ class Crear extends React.Component {
         producto : '',
         descuento : '',
         openAddProduct : false,
-        historyPrices : []
+        historyPrices : [],
+        validcode : false,
+        titlecode : ''
     }
 
     constructor(props){
@@ -63,6 +66,7 @@ class Crear extends React.Component {
         this.handleCloseAddProduct = this.handleCloseAddProduct.bind(this)
         this.openModalHistoryPrice = this.openModalHistoryPrice.bind(this)
         this.handleCloseHistoryPrice = this.handleCloseHistoryPrice.bind(this)
+        this.getPreviewCode = this.getPreviewCode.bind(this)
     }
 
     calculateTotals(){
@@ -84,7 +88,12 @@ class Crear extends React.Component {
     handleChangeInput = name => event => {
         this.setState({
             [name]: event.target.value
-        }, () => this.calculateTotals());
+        }, () => {
+            this.calculateTotals()
+            if(name === 'codigo'){
+                this.getPreviewCode()
+            }
+        });
     }
 
     handleChange = (prod, index) => {
@@ -156,6 +165,8 @@ class Crear extends React.Component {
             list.push({ id_producto, producto : product.nombre, cantidad : 0, placeholder_compra : precio_compra, placeholder_venta : precio_venta, inventario : product.inventario })
             this.setState({
                 list,
+                validcode : false,
+                titlecode : '',
                 openAddProduct : false
             })
         }else{
@@ -216,6 +227,25 @@ class Crear extends React.Component {
         }
     }
 
+    getPreviewCode = async () => {
+        try {
+            let { data } = await axios.post(GET_PRODUCT_CODE, { code : this.state.codigo })
+            if(data.id){
+                this.setState({
+                    validcode : true,
+                    titlecode : data.nombre
+                })
+            }else{
+                throw 'Producto no conocido'
+            }
+        } catch(e) {
+            this.setState({
+                validcode : false,
+                titlecode : ''
+            })
+        }
+    }
+
     handleAdd = async () => {
         if(this.state.id_producto){
             const { precio_compra, precio_venta } = await this.calcularPrecios()
@@ -260,7 +290,8 @@ class Crear extends React.Component {
                             cardTitle="Crear Venta"
                             headerColor='red'
                             classes={{
-                                cardHeader : 'RegularCard-cardTitle-101'
+                                cardHeader : 'RegularCard-cardTitle-101',
+                                card : 'Card-margin'
                             }}
                             content={
                                 <div>
@@ -309,12 +340,14 @@ class Crear extends React.Component {
                                     <hr/>
                                     <Grid container spacing={24} className={styles.row}>
                                         <Grid item xs={12} md={4} className={styles.paper}>
-                                            <InputCodigo 
-                                                handleChangeInput={this.handleChangeInput}
-                                                handleKeyPress={this.handleKeyPress}
-                                                codigo={this.state.codigo}
-                                                errorCode={this.state.errorCode}
-                                            />
+                                            <Tooltip open={this.state.validcode} title={this.state.titlecode}>
+                                                <InputCodigo 
+                                                    handleChangeInput={this.handleChangeInput}
+                                                    handleKeyPress={this.handleKeyPress}
+                                                    codigo={this.state.codigo}
+                                                    errorCode={this.state.errorCode}
+                                                />
+                                            </Tooltip>
                                         </Grid>
                                         <Grid item xs={12} md={4} className={styles.paper}>
                                             <Button classes={{ button: 'text-body primary' }} onClick={this.add}>

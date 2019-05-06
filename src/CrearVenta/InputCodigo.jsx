@@ -11,6 +11,7 @@ const styles = {
 }
 
 class InputCodigo extends React.Component {
+
     render(){
         const { codigo, errorCode, handleChangeInput, handleKeyPress } = this.props
         return (
