@@ -63,15 +63,15 @@ class AddProducto extends React.Component {
         const { id_producto, producto, cantidad, precio_venta, precio_compra, placeholder_compra, placeholder_venta, utilidad, inventario } = this.props
 
         return (
-            <TableRow>
-                <TableCell padding={'dense'}>
+            <tr>
+                <td padding={'dense'}>
                     <Tooltip title="Ver historial de precio de este producto">
-                        <Fab size="small" className="warning" onClick={this.historyPrice}>
-                            <AttachMoney />
+                        <Fab style={{ height:20, width: 20, minHeight: 'unset' }} size="small" className="warning" onClick={this.historyPrice}>
+                            <AttachMoney style={{height: 10}} />
                         </Fab>
                     </Tooltip>
-                </TableCell>
-                <TableCell padding={'dense'}>
+                </td>
+                <td padding={'dense'}>
                     <TextField
                         value={producto}
                         fullWidth={true}
@@ -79,8 +79,8 @@ class AddProducto extends React.Component {
                             readOnly: true
                         }}
                     />
-                </TableCell>
-                <TableCell padding={'dense'} style={{width: 100, maxWidth: 100}}>
+                </td>
+                <td padding={'dense'}>
                     <TextField
                         value={cantidad}
                         fullWidth={true}
@@ -91,8 +91,8 @@ class AddProducto extends React.Component {
                         }}
                         helperText={"Disponible " + inventario}
                     />
-                </TableCell>
-                <TableCell padding={'dense'}>
+                </td>
+                <td padding={'dense'}>
                     <TextField
                         value={precio_venta}
                         fullWidth={true}
@@ -103,13 +103,13 @@ class AddProducto extends React.Component {
                             inputComponent: NumberFormatCustom
                         }}
                     />
-                </TableCell>
-                <TableCell padding={'dense'} style={{width: 100, maxWidth: 100}}>
-                    <Button size="small" color="primary" variant="contained" className="danger" onClick={() => this.props.deleteProduct(id_producto)}>
-                        <DeleteForever />
+                </td>
+                <td padding={'dense'} style={{width: 100, maxWidth: 100}}>
+                    <Button style={{width:20, height:15}} size="small" color="primary" variant="contained" className="danger" onClick={() => this.props.deleteProduct(id_producto)}>
+                        <DeleteForever style={{height:15}} />
                     </Button>
-                </TableCell>
-            </TableRow>
+                </td>
+            </tr>
         )
     }
 }

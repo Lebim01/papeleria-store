@@ -368,23 +368,23 @@ class Crear extends React.Component {
                             }}
                             content={
                                 <div>
-                                    <Table>
-                                        <TableHead>
-                                            <TableRow>
-                                                <TableCell style={{width : 100}}></TableCell>
-                                                <TableCell padding={'dense'}>
+                                    <table className="table">
+                                        <thead>
+                                            <tr>
+                                                <td></td>
+                                                <td padding={'dense'}>
                                                     Producto
-                                                </TableCell>
-                                                <TableCell padding={'dense'} style={{width : 200}}>
+                                                </td>
+                                                <td>
                                                     Cantidad
-                                                </TableCell>
-                                                <TableCell padding={'dense'} style={{width : 200}}>
+                                                </td>
+                                                <td>
                                                     $ Precio Venta
-                                                </TableCell>
-                                                <TableCell padding={'dense'} style={{width : 200}}></TableCell>
-                                            </TableRow>
-                                        </TableHead>
-                                        <TableBody>
+                                                </td>
+                                                <td></td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                                             { list.map((prod, i) => 
                                                 <AddProducto 
                                                     key={i}
@@ -396,8 +396,8 @@ class Crear extends React.Component {
                                                     openModalHistoryPrice={this.openModalHistoryPrice}
                                                 /> 
                                             ) }
-                                        </TableBody>
-                                    </Table>
+                                        </tbody>
+                                    </table>
                                     <Grid container spacing={24} className={styles.row}>
                                         <Grid item xs={12} md={6} style={{ ...styles.paper }}>
                                                 
