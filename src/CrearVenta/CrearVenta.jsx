@@ -287,11 +287,12 @@ class Crear extends React.Component {
                 <Grid container>
                     <ItemGrid xs={12} sm={12} md={12}>
                         <RegularCard
+                            style={{padding:0}}
                             cardTitle="Crear Venta"
                             headerColor='red'
                             classes={{
                                 cardHeader : 'RegularCard-cardTitle-101',
-                                card : 'Card-margin'
+                                card : 'Card-margin',
                             }}
                             content={
                                 <div>
@@ -361,6 +362,7 @@ class Crear extends React.Component {
                     </ItemGrid>
                     <ItemGrid xs={12} sm={12} md={12}>
                         <RegularCard
+                            style={{padding:0}}
                             cardTitle="Productos"
                             headerColor='red'
                             classes={{
@@ -403,8 +405,6 @@ class Crear extends React.Component {
                                                 
                                         </Grid>
                                         <Grid item xs={12} md={6} style={{ ...styles.paper }}>
-                                            <br/>
-                                            <br/>
                                             <br/>
                                             <Typography>
                                                 <Grid container xs={12} md={12}>

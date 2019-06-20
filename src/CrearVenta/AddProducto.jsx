@@ -105,7 +105,7 @@ class AddProducto extends React.Component {
                     />
                 </td>
                 <td padding={'dense'} style={{width: 100, maxWidth: 100}}>
-                    <Button style={{width:20, height:15}} size="small" color="primary" variant="contained" className="danger" onClick={() => this.props.deleteProduct(id_producto)}>
+                    <Button style={{width:20, height:15, margin:0}} size="small" color="primary" variant="contained" className="danger" onClick={() => this.props.deleteProduct(id_producto)}>
                         <DeleteForever style={{height:15}} />
                     </Button>
                 </td>
