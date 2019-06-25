@@ -25,6 +25,7 @@ import DialogAddProduct from './DialogAddProduct';
 import AddProducto from './AddProducto'
 import DialogHistoryPrice from '../CrearInventarioEntrada/DialogHistoryPrice'
 import InputCodigo from './InputCodigo'
+import InputCantidad from './InputCantidad'
 import DelayInput from './DelayInput'
 
 const styles = {
@@ -52,7 +53,8 @@ class Crear extends React.Component {
         openAddProduct : false,
         historyPrices : [],
         validcode : false,
-        titlecode : ''
+        titlecode : '',
+        cantidad : 1
     }
 
     constructor(props){
@@ -162,13 +164,14 @@ class Crear extends React.Component {
         let exists = this.state.list.filter((p) => p.id_producto == id_producto).length > 0
         if(!exists){
             let product = (await axios.post(ONE_PRODUCTS, { id: id_producto })).data
-            list.push({ id_producto, producto : product.nombre, cantidad : 0, placeholder_compra : precio_compra, placeholder_venta : precio_venta, inventario : product.inventario })
+            list.push({ id_producto, producto : product.nombre, cantidad : this.state.cantidad, placeholder_compra : precio_compra, placeholder_venta : precio_venta, inventario : product.inventario })
             this.setState({
                 list,
                 validcode : false,
                 titlecode : '',
-                openAddProduct : false
-            })
+                openAddProduct : false,
+                cantidad : 1
+            }, this.calculateTotals)
         }else{
             toastr.error('Este producto ya esta en la lista')
         }
@@ -255,7 +258,7 @@ class Crear extends React.Component {
 
     async calcularPrecios(){
         const { id_producto, } = this.state
-        const r = await axios.post(SUGGESTED_PRICES, { id_producto, cantidad : 0, precio_compra : null })
+        const r = await axios.post(SUGGESTED_PRICES, { id_producto, cantidad : this.state.cantidad, precio_compra : null })
         return r.data || { precio_compra : '', precio_venta : '' }
     }
 
@@ -268,10 +271,8 @@ class Crear extends React.Component {
             (product.precio_venta > 0 || product.placeholder_venta > 0)
         )
         const isValid = validos.length == list.length && list.length > 0
-
         return (
             <div className="create-line">
-
                 <DialogAddProduct
                     open={this.state.openAddProduct}
                     handleClose={this.handleCloseAddProduct}
@@ -351,6 +352,13 @@ class Crear extends React.Component {
                                             </Tooltip>
                                         </Grid>
                                         <Grid item xs={12} md={4} className={styles.paper}>
+                                            <InputCantidad 
+                                                handleChangeInput={this.handleChangeInput}
+                                                handleKeyPress={this.handleKeyPress}
+                                                cantidad={this.state.cantidad}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} md={4} className={styles.paper}>
                                             <Button classes={{ button: 'text-body primary' }} onClick={this.add}>
                                                 Agregar Producto &nbsp;&nbsp;<i className="fa fa-plus"></i>
                                             </Button>
@@ -400,56 +408,41 @@ class Crear extends React.Component {
                                             ) }
                                         </tbody>
                                     </table>
-                                    <Grid container spacing={24} className={styles.row}>
-                                        <Grid item xs={12} md={6} style={{ ...styles.paper }}>
-                                                
-                                        </Grid>
-                                        <Grid item xs={12} md={6} style={{ ...styles.paper }}>
-                                            <br/>
-                                            <Typography>
-                                                <Grid container xs={12} md={12}>
-                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
-                                                        Subtotal:
-                                                    </Grid>
-                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
-                                                        $ {_subtotal}
-                                                    </Grid>
-                                                </Grid>
-                                                <hr/>
-                                                <Grid container xs={12} md={12}>
-                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
-                                                        <Tooltip title="Subtotal * (1.6 / 100)">
-                                                            <span>Iva:</span>
-                                                        </Tooltip>
-                                                    </Grid>
-                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
-                                                        $ {_iva}
-                                                    </Grid>
-                                                </Grid>
-                                                <hr/>
-                                                <Grid container xs={12} md={12}>
-                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
-                                                        <Tooltip title="(Subtotal + Iva) * (% Descuento / 100)">
-                                                            <span>Descuento:</span>
-                                                        </Tooltip>
-                                                    </Grid>
-                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
-                                                        $ {_descuento}
-                                                    </Grid>
-                                                </Grid>
-                                                <hr/>
-                                                <Grid container xs={12} md={12}>
-                                                    <Grid item xs={6} md={2} style={{ ...styles.paper }}>
-                                                        <Tooltip title="Subtotal + Iva - Descuento">
-                                                            <span>Total:</span>
-                                                        </Tooltip>
-                                                    </Grid>
-                                                    <Grid item xs={6} md={10} style={{ ...styles.paper }}>
-                                                        $ {_total}
-                                                    </Grid>
-                                                </Grid>
-                                            </Typography>
-                                        </Grid>
+                                    <br/>
+                                    <br/>
+                                    <Grid>
+                                        <Tooltip>
+                                            <span>
+                                                <span style={{ fontSize: "16px", borderBottom : "solid", borderColor : "#c2cad8", borderWidth : "1px"}}>
+                                                   SUBTOTAL : $ <b> {_subtotal} </b>
+                                                </span>
+                                                &nbsp;&nbsp;
+                                            </span> 
+                                        </Tooltip>
+                                        <Tooltip title="Subtotal * (1.6 / 100)">
+                                            <span>
+                                                <span style={{ borderBottom : "solid", borderColor : "#c2cad8", borderWidth : "1px"}}>
+                                                    IVA : $ <b> {_iva} </b>
+                                                </span>
+                                                &nbsp;&nbsp;
+                                            </span> 
+                                        </Tooltip>
+                                        <Tooltip title="(Subtotal + Iva) * (% Descuento / 100)">
+                                            <span>
+                                                <span style={{ borderBottom : "solid", borderColor : "#c2cad8", borderWidth : "1px"}}>
+                                                    DESCUENTO : $  <b> {_descuento} </b> 
+                                                </span>
+                                                &nbsp;&nbsp;
+                                            </span> 
+                                        </Tooltip>
+                                        <Tooltip title="Subtotal + Iva - Descuento">
+                                            <span>
+                                                <span style={{ borderBottom : "solid", borderColor : "#c2cad8", borderWidth : "1px"}}>
+                                                    TOTAL : $  <b> {_total} </b>
+                                                </span>
+                                                &nbsp;&nbsp;
+                                            </span> 
+                                        </Tooltip>
                                     </Grid>
                                 </div>
                             }
