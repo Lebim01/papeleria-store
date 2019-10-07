@@ -76,6 +76,10 @@ class App extends Component {
                 <MuiThemeProvider theme={theme}>
                     <Admin loginPage={LoginPage} theme={theme} title={"Papeleria"} authProvider={authProvider} logoutButton={LogoutButton}>
                         <Resource 
+                            name="puntoventa" 
+                            list={CrearVenta}/>
+
+                        <Resource 
                             name="productos" 
                             list={Productos}
                             create={CrearProductos}

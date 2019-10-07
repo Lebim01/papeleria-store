@@ -46,7 +46,7 @@ class Login extends React.Component {
     }
 
     redirect(){
-        window.location = '#/productos'
+        window.location = '#/puntoventa'
     }
 
     render() {
