@@ -65,13 +65,6 @@ class AddProducto extends React.Component {
         return (
             <tr>
                 <td padding={'dense'}>
-                    <Tooltip title="Ver historial de precio de este producto">
-                        <Fab style={{ height:20, width: 20, minHeight: 'unset' }} size="small" className="warning" onClick={this.historyPrice}>
-                            <AttachMoney style={{height: 10}} />
-                        </Fab>
-                    </Tooltip>
-                </td>
-                <td padding={'dense'}>
                     <TextField
                         value={producto}
                         fullWidth={true}

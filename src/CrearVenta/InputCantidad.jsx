@@ -1,15 +1,7 @@
 import React from 'react'
 import { 
     TextField,
-    InputAdornment,
 } from '@material-ui/core'
-
-const styles = {
-    textField : {
-
-    }
-}
-
 class InputCantidad extends React.Component {
 
     render(){
@@ -17,7 +9,6 @@ class InputCantidad extends React.Component {
         return (
             <TextField
                 label="Cantidad"
-                className={styles.textField}
                 value={cantidad}
                 onChange={handleChangeInput('cantidad')}
                 onKeyPress={handleKeyPress}
