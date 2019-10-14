@@ -156,16 +156,10 @@ class Crear extends React.Component {
         })
     }
 
-    enterToAddProducto = (event) => {
-        if (event.key === 'Enter'){
-            this.validCodeProduct()
-        }
-    }
-
     validCodeProduct = async () => {
         try {
             const { id_producto, cantidad } = this.state
-            if(id_producto && cantidad){
+            if(Number(id_producto) >= 1 && Number(cantidad) >= 1){
                 this.handleAdd()
             }else{
                 throw 'Seleccione un producto y coloque una cantidad'
@@ -192,20 +186,10 @@ class Crear extends React.Component {
     }
 
     handleChangeSelect = ({ value, label }, { ...action }) => {
-        console.log(this.selectProducts)
         this.setState({
             id_producto : value,
             searchValue : label
-        })
-    }
-
-    handleChangeSelect2 = (e) => {
-        const { id_producto } = this.state
-        if(!(id_producto && !e)){
-            this.setState({
-                searchValue: e
-            })
-        }
+        }, this.validCodeProduct)
     }
 
     loadOptions = async (inputValue, callback) => {
@@ -219,6 +203,12 @@ class Crear extends React.Component {
     handleChangeCheckbox = (name) => (e) => {
         this.setState({
             [name]: e.target.checked
+        })
+    }
+
+    clearSelect = () => {
+        this.setState({
+            id_producto : ''
         })
     }
 
@@ -283,13 +273,7 @@ class Crear extends React.Component {
                                         <Grid item xs={12} md={4} className={classnames(styles.paper)}>
                                             <Typography>Buscar por nombre, palabras clave, marca, linea</Typography>
                                             <AsyncSelect
-                                                ref={this.selectProducts}
                                                 value={this.state.id_producto}
-                                                inputValue={this.state.searchValue}
-                                                onInputChange={this.handleChangeSelect2}
-
-                                                onKeyDown={this.enterToAddProducto}
-
                                                 loadOptions={this.loadOptions}
                                                 defaultOptions
                                                 onChange={this.handleChangeSelect}
