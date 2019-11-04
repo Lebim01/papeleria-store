@@ -2,19 +2,13 @@ import React from 'react'
 import NumberFormat from 'react-number-format';
 import {
     DeleteForever,
-    AttachMoney
 } from '@material-ui/icons'
 import axios from 'axios'
 import {
-    CustomInput,
     Button
 } from './../components';
 import {
     TextField,
-    TableCell, 
-    TableRow, 
-    Tooltip,
-    Fab
 } from '@material-ui/core'
 import { LIST_PRICE_PRODUCT, SUGGESTED_PRICES } from './../routing'
 

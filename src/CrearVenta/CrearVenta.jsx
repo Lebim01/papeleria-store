@@ -133,7 +133,7 @@ class Crear extends React.Component {
         let exists = this.state.list.filter((p) => p.id_producto == id_producto).length > 0
         if(!exists){
             let product = (await axios.post(ONE_PRODUCTS, { id: id_producto })).data
-            list.push({ id_producto, producto : product.nombre, cantidad : this.state.cantidad, placeholder_compra : precio_compra, placeholder_venta : precio_venta, inventario : product.inventario })
+            list.push({ id_producto, producto : product.nombre, cantidad : this.state.cantidad, placeholder_compra : precio_compra, placeholder_venta : product.precio_venta, inventario : product.inventario })
             this.setState({
                 list,
                 validcode : false,

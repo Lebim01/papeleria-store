@@ -3,6 +3,7 @@ import AddProducto from './AddProducto'
 
 function ListadoProductos(props){
     const { list, black } = props
+
     return (
         <div>
             <table className="table">
